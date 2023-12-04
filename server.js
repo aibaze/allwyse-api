@@ -11,10 +11,17 @@ app.use(express.json())
 const PORT = 4000
 const uri = 'mongodb+srv://bymelinaviera:bymelinaviera@globalu.spsgfxv.mongodb.net/cities?retryWrites=true&w=majority'
 
+
+const createSlug = (firstName,lastName)=>{
+  const rawSlug = `${firstName?.toLowerCase()}-${lastName?.toLowerCase()}`
+  return rawSlug.replace(/ /g,"-")
+
+}
 //ROUTES
 app.post("/create-coach",async (req,res)=>{
    try {
-    const coach = await Coach.create({...req.body})
+    const body = {...req.body, slug:createSlug(req.body.firstName, req.body.lastName)}
+    const coach = await Coach.create(body)
     res.status(201).json({coach})
    } catch (error) {
     console.log(error.message)
@@ -45,10 +52,25 @@ app.put("/update-coach/:id",async (req,res)=>{
          updatedBody['profileInfo.shortDescription'] = payload.shortDescription;
        }
 
+       if (payload.description) {
+        updatedBody['profileInfo.description'] = payload.description;
+      }
+
+      if (payload.studies) {
+        updatedBody['profileInfo.studies'] = payload.studies;
+      }
+
+      if (payload.profileImg) {
+        updatedBody['profileInfo.profileImg'] = payload.profileImg;
+      }
+
+      if (payload.professionalImg) {
+        updatedBody['profileInfo.professionalImg'] = payload.professionalImg;
+      }
 
       await Coach.updateOne({_id: coachId},{$set:updatedBody})
-      const coach = await Coach.findOne({_id: coachId})
-      res.status(201).json({coach})
+      const coach = await Coach.findOne({_id: coachId}).lean()
+      res.status(201).json({...coach})
     } catch (error) {
      console.log(error.message)
      res.status(500).json({message:error.message})

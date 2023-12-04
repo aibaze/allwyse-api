@@ -15,6 +15,9 @@ const CoachSchema = mongoose.Schema(
             type: String,
             required: [true, "Last name is required"]
         },
+        slug:{
+            type: String,
+        },
         email:{
             type: String,
             required: [true, "Email  is required"]
@@ -33,6 +36,9 @@ const CoachSchema = mongoose.Schema(
                 type: [SocialLinkSchema],
             },
             shortDescription:{
+                type: String,
+            },
+            studies:{
                 type: String,
             },
             languages:{
