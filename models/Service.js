@@ -5,37 +5,32 @@ const ServiceSchema = mongoose.Schema(
         title:{
             type: String,
         },
-        slug:{
-            type: String,
-        },
-        shortDescription:{
-            type: String,
-        },
         description:{
             type: String,
         },
-        type:{
+        serviceType:{
             type: String, /* hourly | course | other */
         },
         price:{
             type: String, /* ? */
         },
-        image:{
-            type: String, /* ? */
-        },
         studentAmount:{
             type: String, /* ? */
         },
+        certificatedAs:{
+            type: String, /* ? */
+        },
+        serviceLength:{
+            type: String, /* ? */
+        },
         studentTarget:{
-            type: String, /* ? */
+            type: [String], /* ? */
         },
-        studentBenefits:{
-            type: String, /* ? */
+        skillsLearned:{
+            type: [String], /* ? */
         },
-        advertisingUrl:{
-            type: String, /* ? */
-        }
     }
 )
+const Service = mongoose.model("Service", ServiceSchema)
 
-module.exports = {ServiceSchema}
+module.exports = {ServiceSchema,Service}

@@ -23,7 +23,7 @@ const CoachSchema = mongoose.Schema(
             required: [true, "Email  is required"]
         },
         services:{
-            type: Object
+            type: [String]
         },
         profileInfo:{
             profileImg:{
