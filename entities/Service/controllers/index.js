@@ -7,11 +7,11 @@ const createService = async (req, res) => {
     const { coachId } = req.params;
     const newService = await Service.create(req.body);
 
-     await Coach.updateOne(
+    await Coach.updateOne(
       { _id: new ObjectId(coachId) },
       {
         $push: {
-          services: newService._id,
+          services: new ObjectId(newService._id),
         },
       }
     );
@@ -23,4 +23,20 @@ const createService = async (req, res) => {
   }
 };
 
-module.exports = { createService };
+const getServicesByCoachId = async (req, res) => {
+  try {
+    const { coachId } = req.params;
+
+    const coachServices = await Coach.findOne({ _id: new ObjectId(coachId) }).lean() || []
+    const services = await Service.find({
+      _id: { $in: coachServices.services },
+    });
+
+    res.status(201).json({ services });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { createService ,getServicesByCoachId};
