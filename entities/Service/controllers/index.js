@@ -23,6 +23,21 @@ const createService = async (req, res) => {
   }
 };
 
+const updateService = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const updatedService = await Service.updateOne(
+      { _id: new ObjectId(serviceId) },
+      { $set: req.body }
+    );
+
+    res.status(200).json({ service: updatedService });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const deleteService = async (req, res) => {
   try {
     const { coachId, serviceId } = req.params;
@@ -64,4 +79,4 @@ const getServicesByCoachId = async (req, res) => {
   }
 };
 
-module.exports = { createService, getServicesByCoachId,deleteService };
+module.exports = { createService, getServicesByCoachId, deleteService,updateService };
