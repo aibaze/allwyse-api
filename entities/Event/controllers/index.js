@@ -47,7 +47,6 @@ const createEvent = async (req, res) => {
       },
     });
     googleError= false
-
     const event = await Event.create({...req.body,title:`${req.body.studentName} (${req.body.description})` });
     res.status(201).json({ event });
   } catch (error) {

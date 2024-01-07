@@ -16,6 +16,9 @@ const EventSchema = mongoose.Schema({
   end: {
     type: Number,
   },
+  duration:{
+    type: Number
+  },
   studentEmail: {
     type: String,
   },
