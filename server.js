@@ -3,11 +3,11 @@ require("dotenv").config();
 const moongose = require("mongoose");
 const cors = require("cors");
 const app = express();
+
 const { coachRouter } = require("./entities/Coach/routes");
 const { serviceRouter } = require("./entities/Service/routes");
 const { eventRouter } = require("./entities/Event/routes");
 const { google } = require("googleapis");
-const { UserRefreshClient } = require("google-auth-library");
 const { v4: uuid } = require("uuid");
 const dayjs = require("dayjs");
 const {GoogleInfo} = require("./models/GoogleInfo")
@@ -34,14 +34,14 @@ const scopes = ["https://www.googleapis.com/auth/calendar"];
 //ROUTES
 app.use("/coach", coachRouter);
 app.use("/service", serviceRouter);
-//app.use("/event", eventRouter);
+app.use("/event", eventRouter);
 
-app.get('/event/coach/:coachId',async (req,res)=>{
+/* app.get('/event/coach/:coachId',async (req,res)=>{
 const events = await Event.find({coachId:req.params.coachId})
 res.json({events})
-})
+}) */
 
-app.post("/event/create-event", async (req, res) => {
+/* app.post("/event/create-event", async (req, res) => {
   const {attendees,userTimeZone,start,end,title,description,coachId} = req.body
   const googleInfo = await GoogleInfo.findOne({coachId:coachId}) 
 
@@ -85,8 +85,8 @@ app.post("/event/create-event", async (req, res) => {
     res.send({error:error.message})
   }
 
-});
-app.get("/google/authorized/:coachId",async(req,res)=>{
+}); */
+/* app.get("/google/authorized/:coachId",async(req,res)=>{
   const googleInfo = await GoogleInfo.findOne({coachId:req.params.coachId})
   console.log("checked")
   
@@ -109,7 +109,7 @@ app.post('/google/auth', async (req, res) => {
   console.log("auth done")
   res.json({message:"ok",error:null})
 })
-
+ */
 
 
 moongose
