@@ -2,7 +2,7 @@ const { Event } = require("../../../models/Event");
 
 const createEvent = async (req, res) => {
   try {
-    const event = await Event.create(req.body);
+    const event = await Event.create({...req.body,title:`${req.body.studentName} (${req.body.description})` });
     res.status(201).json({ event });
   } catch (error) {
     console.log(error.message);

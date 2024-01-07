@@ -11,6 +11,7 @@ const { UserRefreshClient } = require("google-auth-library");
 const { v4: uuid } = require("uuid");
 const dayjs = require("dayjs");
 const {GoogleInfo} = require("./models/GoogleInfo")
+const {Event} = require("./models/Event")
 const {createEvent} = require("./entities/Event/controllers")
 
 app.use(cors());
@@ -34,6 +35,11 @@ const scopes = ["https://www.googleapis.com/auth/calendar"];
 app.use("/coach", coachRouter);
 app.use("/service", serviceRouter);
 //app.use("/event", eventRouter);
+
+app.get('/event/coach/:coachId',async (req,res)=>{
+const events = await Event.find({coachId:req.params.coachId})
+res.json({events})
+})
 
 app.post("/event/create-event", async (req, res) => {
   const {attendees,userTimeZone,start,end,title,description,coachId} = req.body
@@ -89,9 +95,6 @@ app.get("/google/authorized/:coachId",async(req,res)=>{
   }
   res.json({message:'OK',error:null})
 })
-
-
-
 
 app.post('/google/auth', async (req, res) => {
   const { tokens } = await auth2Client.getToken(req.body.code);
