@@ -10,6 +10,8 @@ const { google } = require("googleapis");
 const { UserRefreshClient } = require("google-auth-library");
 const { v4: uuid } = require("uuid");
 const dayjs = require("dayjs");
+const {GoogleInfo} = require("./models/GoogleInfo")
+const {createEvent} = require("./entities/Event/controllers")
 
 app.use(cors());
 app.use(express.json());
@@ -31,18 +33,14 @@ const scopes = ["https://www.googleapis.com/auth/calendar"];
 //ROUTES
 app.use("/coach", coachRouter);
 app.use("/service", serviceRouter);
-app.use("/event", eventRouter);
+//app.use("/event", eventRouter);
 
+app.post("/event/create-event", async (req, res) => {
+  const {attendees,userTimeZone,start,end,title,description,coachId} = req.body
+  const googleInfo = await GoogleInfo.findOne({coachId:coachId}) 
 
-app.post("/event/schedule", async (req, res) => {
-  const {attendees,userTimeZone,startDate,endDate,title,description,code} = req.body
-
- if(!auth2Client.credentials.access_token){ 
-  const { tokens } = await auth2Client.getToken(code);
-  auth2Client.setCredentials(tokens);
-  console.log(auth2Client,"despues")
- } 
-    
+  let googleError = true
+  auth2Client.setCredentials({refresh_token:googleInfo?.token});
 
   try {
     await calendar.events.insert({
@@ -53,43 +51,63 @@ app.post("/event/schedule", async (req, res) => {
         summary: title,
         description: description,
         start: {
-          dateTime: startDate,//dayjs().add(1, "day").toISOString(),
-          timeZone: userTimeZone // "Asia/Kuala_Lumpur",
+          dateTime: dayjs(start),
+          timeZone: userTimeZone 
         },
         end: {
-          dateTime: endDate,//dayjs().add(1, "day").add(1, "hour").toISOString(),
-          timeZone: userTimeZone // "Asia/Kuala_Lumpur",
+          dateTime: dayjs(end),
+          timeZone: userTimeZone 
         },
         conferenceData: {
           createRequest: {
             requestId: uuid(),
           },
         },
-        attendees:attendees  /* [
-          { email: "bymelinaviera@gmail.com" },
-          { email: "soytomasgoldenberg@gmail.com" },
-        ] */
+        attendees:attendees  
       },
     });
-    res.send("done");
+    googleError= false
+    await createEvent(req,res)
 
   } catch (error) {
     console.log(error);
+
+    if(googleError){
+     GoogleInfo.deleteMany({coachId:coachId})
+    }
+
     res.send({error:error.message})
   }
 
 });
-
-app.post('/auth/google/refresh-token', async (req, res) => {
-  const user = new UserRefreshClient(
-    clientId,
-    clientSecret,
-    req.body.refreshToken,
-  );
-  const { credentials } = await user.refreshAccessToken(); // optain new tokens
-
-  res.json(credentials);
+app.get("/google/authorized/:coachId",async(req,res)=>{
+  const googleInfo = await GoogleInfo.findOne({coachId:req.params.coachId})
+  console.log("checked")
+  
+  if(!googleInfo){
+   return res.json({message:"Not authorized",error:"Not authorized", statusCode:403})
+  }
+  res.json({message:'OK',error:null})
 })
+
+
+
+
+app.post('/google/auth', async (req, res) => {
+  const { tokens } = await auth2Client.getToken(req.body.code);
+  const body = {
+    token: tokens.refresh_token,
+    expiresIn: tokens.expiry_date,
+    coachId: req.body.coachId
+  }
+
+  await GoogleInfo.deleteMany({coachId:req.body.coachId})
+  await GoogleInfo.create(body)
+  console.log("auth done")
+  res.json({message:"ok",error:null})
+})
+
+
 
 moongose
   .connect(uri)
