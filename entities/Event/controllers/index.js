@@ -7,8 +7,7 @@ const { GoogleInfo } = require("../../../models/GoogleInfo");
 const auth2Client = new google.auth.OAuth2(
   process.env.CALENAR_CLIENT_KEY,
   process.env.CALENDAR_CLIENT_SECRET,
-"postmessage"
-
+  "postmessage"
 );
 const calendar = google.calendar({
   version: "v3",
@@ -17,12 +16,13 @@ const calendar = google.calendar({
 
 const createEvent = async (req, res) => {
   try {
-    const {attendees,userTimeZone,start,end,title,description,coachId} = req.body
-    const googleInfo = await GoogleInfo.findOne({coachId:coachId}) 
-  
-    let googleError = true
-    auth2Client.setCredentials({refresh_token:googleInfo?.token});
-  
+    const { attendees, userTimeZone, start, end, title, description, coachId } =
+      req.body;
+    const googleInfo = await GoogleInfo.findOne({ coachId: coachId });
+
+    let googleError = true;
+    auth2Client.setCredentials({ refresh_token: googleInfo?.token });
+
     await calendar.events.insert({
       calendarId: "primary",
       auth: auth2Client,
@@ -32,57 +32,81 @@ const createEvent = async (req, res) => {
         description: description,
         start: {
           dateTime: dayjs(start),
-          timeZone: userTimeZone 
+          timeZone: userTimeZone,
         },
         end: {
           dateTime: dayjs(end),
-          timeZone: userTimeZone 
+          timeZone: userTimeZone,
         },
         conferenceData: {
           createRequest: {
             requestId: uuid(),
           },
         },
-        attendees:attendees  
+        attendees: attendees,
       },
     });
-    googleError= false
-    const event = await Event.create({...req.body,title:`${req.body.studentName} (${req.body.description})` });
+    googleError = false;
+    const event = await Event.create({
+      ...req.body,
+      title: `${req.body.studentName} (${req.body.description})`,
+    });
     res.status(201).json({ event });
   } catch (error) {
-    if(googleError){
-      GoogleInfo.deleteMany({coachId:coachId})
-     }
+    if (googleError) {
+      GoogleInfo.deleteMany({ coachId: coachId });
+    }
     res.status(500).json({ message: error.message });
   }
 };
 
-const getEventsByCoach = async (req,res)=>{
-  const events = await Event.find({coachId:req.params.coachId})
-  res.json({events})
-  }
+const getEventsByCoach = async (req, res) => {
+  const events = await Event.find({ coachId: req.params.coachId });
+  res.json({ events });
+};
 
-  const checkIfItsAuth = async(req,res)=>{
-    const googleInfo = await GoogleInfo.findOne({coachId:req.params.coachId})
-    console.log("checked")
-    
-    if(!googleInfo){
-     return res.json({message:"Not authorized",error:"Not authorized", statusCode:403})
-    }
-    res.json({message:'OK',error:null})
+const checkIfItsAuth = async (req, res) => {
+  const googleInfo = await GoogleInfo.findOne({ coachId: req.params.coachId });
+  console.log("checked");
+
+  if (!googleInfo) {
+    return res.json({
+      message: "Not authorized",
+      error: "Not authorized",
+      statusCode: 403,
+    });
   }
-const googleAuth =  async (req, res) => {
+  res.json({ message: "OK", error: null });
+};
+const googleAuth = async (req, res) => {
   const { tokens } = await auth2Client.getToken(req.body.code);
   const body = {
     token: tokens.refresh_token,
     expiresIn: tokens.expiry_date,
-    coachId: req.body.coachId
-  }
+    coachId: req.body.coachId,
+  };
 
-  await GoogleInfo.deleteMany({coachId:req.body.coachId})
-  await GoogleInfo.create(body)
-  console.log("auth done")
-  res.json({message:"ok",error:null})
-}
+  await GoogleInfo.deleteMany({ coachId: req.body.coachId });
+  await GoogleInfo.create(body);
+  console.log("auth done");
+  res.json({ message: "ok", error: null });
+};
 
-module.exports = { createEvent,getEventsByCoach,checkIfItsAuth,googleAuth };
+const getPublicEventsByCoach = async(req,res) => {
+  const events = await Event.find({coachId:req.params.coachId})
+  const parsedEvents = events.map(event => {
+    return{
+      title:"Busy",
+      color:event.color,
+      start:event.start,
+      end:event.end,
+      sendEmail:event.sendEmail,
+      _id:event._id,
+      serviceId:event.serviceId,
+      coachId:event.coachId
+    }
+  })
+  res.json({events:parsedEvents})
+};
+
+module.exports = { createEvent, getEventsByCoach, checkIfItsAuth, googleAuth ,getPublicEventsByCoach};

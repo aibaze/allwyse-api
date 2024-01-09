@@ -78,6 +78,18 @@ const createSlug = (firstName,lastName)=>{
     }
  }
 
+
+ const getCoachBySlug = async (req,res)=>{
+  try {
+   const slug = req.params.slug
+   const coach = await Coach.findOne({slug}).lean()
+   res.status(200).json({...coach})
+  } catch (error) {
+   console.log(error.message)
+   res.status(500).json({message:error.message})
+  }
+}
+
  const deleteCoach = async (req,res)=>{
     try {
      const isEmail = req.params.id.includes("@")
@@ -94,4 +106,4 @@ const createSlug = (firstName,lastName)=>{
     }
  }
 
- module.exports = {updateCoach,createCoach,getCoach,deleteCoach}
+ module.exports = {updateCoach,createCoach,getCoach,deleteCoach,getCoachBySlug}
