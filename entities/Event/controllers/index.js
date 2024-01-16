@@ -67,7 +67,6 @@ const getEventsByCoach = async (req, res) => {
 
 const checkIfItsAuth = async (req, res) => {
   const googleInfo = await GoogleInfo.findOne({ coachId: req.params.coachId });
-  console.log("checked");
 
   if (!googleInfo) {
     return res.json({
@@ -88,7 +87,6 @@ const googleAuth = async (req, res) => {
 
   await GoogleInfo.deleteMany({ coachId: req.body.coachId });
   await GoogleInfo.create(body);
-  console.log("auth done");
   res.json({ message: "ok", error: null });
 };
 
