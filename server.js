@@ -7,24 +7,25 @@ const app = express();
 const { coachRouter } = require("./entities/Coach/routes");
 const { serviceRouter } = require("./entities/Service/routes");
 const { eventRouter } = require("./entities/Event/routes");
+const { leadRouter } = require("./entities/Lead/routes");
+const { suggestionRouter } = require("./entities/BetaSuggestion/routes");
 const { google } = require("googleapis");
 const { v4: uuid } = require("uuid");
 const dayjs = require("dayjs");
-const {GoogleInfo} = require("./models/GoogleInfo")
-const {Event} = require("./models/Event")
-const {createEvent} = require("./entities/Event/controllers")
+const { GoogleInfo } = require("./models/GoogleInfo");
+const { Event } = require("./models/Event");
+const { createEvent } = require("./entities/Event/controllers");
 
 app.use(cors());
 app.use(express.json());
 
 const PORT = 4000;
-const uri =process.env.DB_URI;
+const uri = process.env.DB_URI;
 
 const auth2Client = new google.auth.OAuth2(
   process.env.CALENAR_CLIENT_KEY,
   process.env.CALENDAR_CLIENT_SECRET,
-"postmessage"
-
+  "postmessage"
 );
 const calendar = google.calendar({
   version: "v3",
@@ -35,9 +36,8 @@ const scopes = ["https://www.googleapis.com/auth/calendar"];
 app.use("/coach", coachRouter);
 app.use("/service", serviceRouter);
 app.use("/event", eventRouter);
-
-
-
+app.use("/lead", leadRouter);
+app.use("/suggestion", suggestionRouter);
 
 moongose
   .connect(uri)
