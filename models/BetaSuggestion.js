@@ -5,6 +5,7 @@ const BetaSuggestionSchema = mongoose.Schema({
     type: String,
   },
   rating:{ type: String },
+  email:{ type: String },
   adoptability:{ type: String },
   section: { type: String },
 });

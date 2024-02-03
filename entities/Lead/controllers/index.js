@@ -2,8 +2,14 @@ const { Lead } = require("../../../models/Lead");
 
 const createLead = async (req, res) => {
   try {
-    const newLead = await Lead.create(req.body);
 
+    const existingLead = await Lead.findOne({"email":req.body.email})
+    if(existingLead){
+      res.status(400).json({ message: "This email is already submitted for our beta" });
+    }
+
+
+    const newLead = await Lead.create(req.body);
     res.status(201).json({ lead: newLead });
   } catch (error) {
     console.log(error.message);
