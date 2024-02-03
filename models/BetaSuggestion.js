@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 
 const BetaSuggestionSchema = mongoose.Schema({
-  token: {
+  message: {
     type: String,
   },
-  expiresIn: { type: Number },
-  coachId: { type: mongoose.Types.ObjectId },
+  rating:{ type: String },
+  adoptability:{ type: String },
+  section: { type: String },
 });
 
 const BetaSuggestion = mongoose.model(

@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const LeadsSchema = mongoose.Schema({
-  token: {
+  email: {
     type: String,
   },
-  expiresIn: { type: Number },
-  coachId: { type: mongoose.Types.ObjectId },
+  name: { type: String },
+  specialty: { type: String },
 });
 
 const Lead = mongoose.model("Lead", LeadsSchema, "lead");
