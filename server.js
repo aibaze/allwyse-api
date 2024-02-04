@@ -10,28 +10,13 @@ const { eventRouter } = require("./entities/Event/routes");
 const { leadRouter } = require("./entities/Lead/routes");
 const { suggestionRouter } = require("./entities/BetaSuggestion/routes");
 const { google } = require("googleapis");
-const { v4: uuid } = require("uuid");
-const dayjs = require("dayjs");
-const { GoogleInfo } = require("./models/GoogleInfo");
-const { Event } = require("./models/Event");
-const { createEvent } = require("./entities/Event/controllers");
 
-app.use(cors());
+app.use(cors()); // to do = imrpove cors policy
 app.use(express.json());
 
 const PORT = 4000;
 const uri = process.env.DB_URI;
 
-const auth2Client = new google.auth.OAuth2(
-  process.env.CALENAR_CLIENT_KEY,
-  process.env.CALENDAR_CLIENT_SECRET,
-  "postmessage"
-);
-const calendar = google.calendar({
-  version: "v3",
-  auth: process.env.CALENDAR_API_KEY,
-});
-const scopes = ["https://www.googleapis.com/auth/calendar"];
 //ROUTES
 app.use("/coach", coachRouter);
 app.use("/service", serviceRouter);

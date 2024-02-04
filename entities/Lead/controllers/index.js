@@ -5,7 +5,7 @@ const createLead = async (req, res) => {
 
     const existingLead = await Lead.findOne({"email":req.body.email})
     if(existingLead){
-      res.status(400).json({ message: "This email is already submitted for our beta" });
+     throw new Error("This email already has access to the beta")
     }
 
 
