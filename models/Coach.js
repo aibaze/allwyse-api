@@ -20,6 +20,12 @@ const CoachSchema = mongoose.Schema(
       type: String,
       required: [true, "Email  is required"],
     },
+    availabilityFrom: {
+      type: String,
+    },
+    availabilityTo: {
+      type: String,
+    },
     services: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -56,10 +62,15 @@ const CoachSchema = mongoose.Schema(
         type: String,
       },
     },
-    students: {
-      type: [StudentSchema],
-      default: [],
-    },
+    students:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Student",
+      },
+    ],
+    reviews:{
+      type:{String} // to do create a schema for reviews
+    }
   },
   {
     timestamps: true,

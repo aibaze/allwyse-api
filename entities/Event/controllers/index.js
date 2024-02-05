@@ -15,12 +15,12 @@ const calendar = google.calendar({
 });
 
 const createEvent = async (req, res) => {
+  let googleError = true;
   try {
     const { attendees, userTimeZone, start, end, title, description, coachId } =
       req.body;
     const googleInfo = await GoogleInfo.findOne({ coachId: coachId });
 
-    let googleError = true;
     auth2Client.setCredentials({ refresh_token: googleInfo?.token });
 
     await calendar.events.insert({
