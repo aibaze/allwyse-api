@@ -48,14 +48,16 @@ function verifyJsonWebTokenSignature(token, jsonWebKey, clbk) {
 }
 
 const authMiddleware = (req, res, next) => {
-  const authorizationHeader = req.header("Authorization");
- 
-  if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+  const authorizationHeader = req.header("Authorization") ? req.header("Authorization") : req.cookies.Authorization  
+
+  const startsWith = authorizationHeader.startsWith("Bearer ") 
+  if (!authorizationHeader || !startsWith) {
     return res
       .status(401)
       .json({ error: true, message: "Invalid authorization header" });
   } 
-  const token = authorizationHeader.replace("Bearer ", "") 
+  
+  const token =   authorizationHeader.replace("Bearer ", "") 
 
   if (!token) {
     return res

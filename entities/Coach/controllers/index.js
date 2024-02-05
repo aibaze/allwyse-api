@@ -1,8 +1,7 @@
 const { ObjectId } = require("mongodb");
 const Coach = require("../../../models/Coach");
 const { MailtrapClient } = require("mailtrap");
-
-
+const cookie = require('cookie');
 const createSlug = (firstName, lastName) => {
   const rawSlug = `${firstName?.toLowerCase()}-${lastName?.toLowerCase()}`;
   return rawSlug.replace(/ /g, "-");
@@ -15,11 +14,11 @@ const createCoach = async (req, res) => {
       slug: createSlug(req.body.firstName, req.body.lastName),
     };
     const coach = await Coach.create(body);
-    const TOKEN = process.env.EMAIL_API_KEY
+    const TOKEN = process.env.EMAIL_API_KEY;
     const client = new MailtrapClient({ token: TOKEN });
     await client.send({
-      from: {email:"info@allwyse.io"},
-      to: [{ email: coach.email}],
+      from: { email: "info@allwyse.io" },
+      to: [{ email: coach.email }],
       subject: `Welcome to Allwyse ${coach.firstName} ${coach.lastName}  !`,
       text: `Welcome to your own professional platform`,
     });
@@ -78,13 +77,20 @@ const updateCoach = async (req, res) => {
 };
 
 const getCoach = async (req, res) => {
-
   try {
     const isEmail = req.params.id.includes("@");
     const query = isEmail
       ? { email: req.params.id }
       : { _id: new ObjectId(req.params.id) };
     const coach = await Coach.findOne(query).lean();
+    const authorizationHeader = req.header("Authorization");
+
+    let minute = 60 * 1000;
+    res.setHeader('Set-Cookie', cookie.serialize('Authorization', authorizationHeader, {
+      httpOnly: true,
+      maxAge: minute * 60 ,
+      path:"/"
+    })); 
     res.status(200).json({ ...coach });
   } catch (error) {
     console.log(error.message);

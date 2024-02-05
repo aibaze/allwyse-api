@@ -84,4 +84,5 @@ const getStudentsByCoach = async (req, res) => {
 
 module.exports = {
   createStudent,
+  getStudentsByCoach
 };
