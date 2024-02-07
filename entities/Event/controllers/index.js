@@ -3,6 +3,7 @@ const { v4: uuid } = require("uuid");
 const dayjs = require("dayjs");
 const { Event } = require("../../../models/Event");
 const { GoogleInfo } = require("../../../models/GoogleInfo");
+const { ObjectId } = require("mongodb");
 
 const auth2Client = new google.auth.OAuth2(
   process.env.CALENAR_CLIENT_KEY,
@@ -19,7 +20,7 @@ const createEvent = async (req, res) => {
   try {
     const { attendees, userTimeZone, start, end, title, description, coachId } =
       req.body;
-    const googleInfo = await GoogleInfo.findOne({ coachId: coachId });
+    const googleInfo = await GoogleInfo.findOne({ coachId: new ObjectId(coachId) });
 
     auth2Client.setCredentials({ refresh_token: googleInfo?.token });
 
@@ -47,6 +48,7 @@ const createEvent = async (req, res) => {
       },
     });
     googleError = false;
+
     const event = await Event.create({
       ...req.body,
       title: `${req.body.studentName} (${req.body.description})`,
@@ -54,7 +56,7 @@ const createEvent = async (req, res) => {
     res.status(201).json({ event });
   } catch (error) {
     if (googleError) {
-      GoogleInfo.deleteMany({ coachId: coachId });
+     await GoogleInfo.deleteOne({ coachId: new ObjectId(req.body.coachId )});
     }
     res.status(500).json({ message: error.message });
   }

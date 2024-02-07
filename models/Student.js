@@ -45,7 +45,7 @@ const StudentSchema = mongoose.Schema(
     profileImg: {
       type: String,
     },
-    progress: {
+    sessions: {
         type: Number,
     },
     state: {

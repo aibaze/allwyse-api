@@ -22,6 +22,9 @@ const EventSchema = mongoose.Schema({
   studentEmail: {
     type: String,
   },
+  studentId: {
+    type: mongoose.Types.ObjectId,
+  },
   studentName: {
     type: String,
   },

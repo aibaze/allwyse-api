@@ -2,6 +2,7 @@ const { MailtrapClient } = require("mailtrap");
 
 const { ObjectId } = require("mongodb");
 const { Student } = require("../../../models/Student");
+const { Event } = require("../../../models/Event");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
 
@@ -51,11 +52,7 @@ const createStudent = async (req, res) => {
       from: { email: "info@allwyse.io" },
       to: [{ email: student.email }],
       subject: `Hello from ${coach.firstName} ${coach.lastName} coaching platform !`,
-      text: `Welcome ${student.firstName}, ${coach.firstName} ${
-        coach.lastName
-      } has invited you to sign up in its platform to start you process  ${
-        service?.title ? `into the ${service.title} service` : ""
-      } !!, please click here to create your account www.allwyse.io/auth/register`,
+      text: email,
     });
     res.status(201).json({ student });
   } catch (error) {
@@ -69,12 +66,39 @@ const getStudentsByCoach = async (req, res) => {
     const coach = await Coach.findOne({
       _id: new ObjectId(req.params.coachId),
     });
+    if (!req.query.detailed) {
+    }
 
     if (!coach) {
       throw new Error("Coach not found");
     }
 
-    const students = await Student.find({ _id: { $in: coach.students } });
+    const matchObj = { _id: { $in: coach.students } };
+    let students = [];
+
+    if (!req.query.detailed) {
+      students = await Student.find(matchObj)
+    } else {
+      students = await Student.aggregate([
+        { $match: matchObj },
+        {
+          $lookup: {
+            from: "events",
+            localField: "_id",
+            foreignField: "studentId",
+            as: "events",
+          },
+        },
+        {
+          $lookup: {
+            from: "services",
+            localField: "services",
+            foreignField: "_id",
+            as: "servicesDetails",
+          },
+        },
+      ]);
+    }
 
     res.status(200).json({ students });
   } catch (error) {
@@ -84,5 +108,5 @@ const getStudentsByCoach = async (req, res) => {
 
 module.exports = {
   createStudent,
-  getStudentsByCoach
+  getStudentsByCoach,
 };
