@@ -11,12 +11,11 @@ const { eventRouter } = require("./entities/Event/routes");
 const { leadRouter } = require("./entities/Lead/routes");
 const { studentRouter } = require("./entities/Student/routes");
 const { suggestionRouter } = require("./entities/BetaSuggestion/routes");
-const { google } = require("googleapis");
+const { requestRouter } = require("./entities/Request/routes");
 
-app.use(cors({credentials:true, origin:true})); // to do = imrpove cors policy
+app.use(cors({ credentials: true, origin: true })); // to do = imrpove cors policy
 app.use(express.json());
-app.options('*', cors({credentials:true, origin:true}))
-
+app.options("*", cors({ credentials: true, origin: true }));
 
 /*  app.use(
   (req, res, next) => {
@@ -37,9 +36,11 @@ const uri = process.env.DB_URI;
 app.use("/coach", coachRouter);
 app.use("/service", serviceRouter);
 app.use("/event", eventRouter);
+app.use("/student", studentRouter);
+app.use("/request", requestRouter);
+
 app.use("/lead", leadRouter);
 app.use("/suggestion", suggestionRouter);
-app.use("/student", studentRouter);
 
 moongose
   .connect(uri)
