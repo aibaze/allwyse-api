@@ -13,7 +13,7 @@ const { studentRouter } = require("./entities/Student/routes");
 const { suggestionRouter } = require("./entities/BetaSuggestion/routes");
 const { requestRouter } = require("./entities/Request/routes");
 
-app.use(cors({ credentials: true, origin: false })); // to do = imrpove cors policy
+app.use(cors({ credentials: true, origin: true })); // to do = imrpove cors policy
 app.use(express.json());
 app.options("*", cors({ credentials: true, origin: true }));
 
