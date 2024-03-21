@@ -5,6 +5,12 @@ const ServiceSchema = mongoose.Schema(
     title: {
       type: String,
     },
+    category: {
+      type: String,
+    },
+    shortDescription: {
+      type: String,
+    },
     description: {
       type: String,
     },
