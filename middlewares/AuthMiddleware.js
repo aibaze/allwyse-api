@@ -48,6 +48,9 @@ function verifyJsonWebTokenSignature(token, jsonWebKey, clbk) {
 }
 
 const authMiddleware = (req, res, next) => {
+  console.log(req.header("x_auth_token"), `req.header("x_auth_token")`);
+  console.log(req.cookies.x_auth_token, `req.cookies.x_auth_token`);
+
   const authorizationHeader = req.header("x_auth_token")
     ? req.header("x_auth_token")
     : req.cookies.x_auth_token;  

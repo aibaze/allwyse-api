@@ -92,6 +92,7 @@ const getCoach = async (req, res) => {
         httpOnly: true,
         maxAge: minute * 60,
         path: "/",
+        sameSite: "none",
       })
     ); 
     res.status(200).json({ ...coach });
