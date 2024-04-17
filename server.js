@@ -2,7 +2,7 @@ const express = require("express");
 require("dotenv").config();
 const moongose = require("mongoose");
 const cors = require("cors");
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
 const app = express();
 
 const { coachRouter } = require("./entities/Coach/routes");
@@ -16,17 +16,6 @@ const { requestRouter } = require("./entities/Request/routes");
 app.use(cors({ credentials: true, origin: true })); // to do = imrpove cors policy
 app.use(express.json());
 app.options("*", cors({ credentials: true, origin: true }));
-
-/*  app.use(
-  (req, res, next) => {
-    
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE');
-    next();
-}
-)  */
 app.use(cookieParser());
 
 const PORT = 4000;

@@ -1,7 +1,7 @@
 const { ObjectId } = require("mongodb");
 const Coach = require("../../../models/Coach");
 const { MailtrapClient } = require("mailtrap");
-const cookie = require('cookie');
+const cookie = require("cookie");
 const createSlug = (firstName, lastName) => {
   const rawSlug = `${firstName?.toLowerCase()}-${lastName?.toLowerCase()}`;
   return rawSlug.replace(/ /g, "-");
@@ -15,13 +15,14 @@ const createCoach = async (req, res) => {
     };
     const coach = await Coach.create(body);
     const TOKEN = process.env.EMAIL_API_KEY;
-    const client = new MailtrapClient({ token: TOKEN });
+    console.log(TOKEN);
+    /*  const client = new MailtrapClient({ token: TOKEN });
     await client.send({
       from: { email: "info@allwyse.io" },
       to: [{ email: coach.email }],
       subject: `Welcome to Allwyse ${coach.firstName} ${coach.lastName}  !`,
       text: `Welcome to your own professional platform`,
-    });
+    }); */
     res.status(201).json({ coach });
   } catch (error) {
     console.log(error.message);
@@ -94,7 +95,7 @@ const getCoach = async (req, res) => {
         path: "/",
         sameSite: "none",
       })
-    ); 
+    );
     res.status(200).json({ ...coach });
   } catch (error) {
     console.log(error.message);
