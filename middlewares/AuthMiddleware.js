@@ -48,21 +48,18 @@ function verifyJsonWebTokenSignature(token, jsonWebKey, clbk) {
 }
 
 const authMiddleware = (req, res, next) => {
-  console.log(req.header("x_auth_token"), `req.header("x_auth_token")`);
-  console.log(req.cookies.x_auth_token, `req.cookies.x_auth_token`);
-
   const authorizationHeader = req.header("x_auth_token")
     ? req.header("x_auth_token")
-    : req.cookies.x_auth_token;  
+    : req.cookies.x_auth_token;
 
-  const startsWith = authorizationHeader.startsWith("Bearer ") 
+  const startsWith = authorizationHeader.startsWith("Bearer ");
   if (!authorizationHeader || !startsWith) {
     return res
       .status(401)
       .json({ error: true, message: "Invalid authorization header" });
-  } 
-  
-  const token =   authorizationHeader.replace("Bearer ", "") 
+  }
+
+  const token = authorizationHeader.replace("Bearer ", "");
 
   if (!token) {
     return res
@@ -74,12 +71,11 @@ const authMiddleware = (req, res, next) => {
   const jsonWebKey = getJsonWebKeyWithKID(header.kid);
   verifyJsonWebTokenSignature(token, jsonWebKey, (err, decodedToken) => {
     if (err?.expiredAt) {
-      return res.status(401).json({ error: true
-        , message: "Invalid token" });
+      return res.status(401).json({ error: true, message: "Invalid token" });
     } else {
       req.loggedUser = decodedToken.email;
       next();
     }
   });
 };
-module.exports= authMiddleware;
+module.exports = authMiddleware;
