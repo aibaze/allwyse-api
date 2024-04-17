@@ -15,14 +15,14 @@ const createCoach = async (req, res) => {
     };
     const coach = await Coach.create(body);
     const TOKEN = process.env.EMAIL_API_KEY;
-    console.log(TOKEN);
-    /*  const client = new MailtrapClient({ token: TOKEN });
+    console.log(TOKEN, "line 18");
+    const client = new MailtrapClient({ token: TOKEN });
     await client.send({
       from: { email: "info@allwyse.io" },
       to: [{ email: coach.email }],
       subject: `Welcome to Allwyse ${coach.firstName} ${coach.lastName}  !`,
       text: `Welcome to your own professional platform`,
-    }); */
+    });
     res.status(201).json({ coach });
   } catch (error) {
     console.log(error.message);
