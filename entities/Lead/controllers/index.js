@@ -1,13 +1,16 @@
 const { Lead } = require("../../../models/Lead");
+const validator = require("validator");
 
 const createLead = async (req, res) => {
   try {
-
-    const existingLead = await Lead.findOne({"email":req.body.email})
-    if(existingLead){
-     throw new Error("This email already has access to the beta")
+    const isValidEmail = validator.isEmail(req.body?.email);
+    if (!isValidEmail) {
+      throw new Error("Invalid email");
     }
-
+    const existingLead = await Lead.findOne({ email: req.body.email });
+    if (existingLead) {
+      throw new Error("This email is already suscribed to our newsletter.");
+    }
 
     const newLead = await Lead.create(req.body);
     res.status(201).json({ lead: newLead });
