@@ -1,8 +1,8 @@
-const { BetaSuggestion } = require("../../../models/BetaSuggestion");
+const { BugReport } = require("../../../models/BugReport");
 
-const createSuggestion = async (req, res) => {
+const createReport = async (req, res) => {
   try {
-    await BetaSuggestion.create(req.body);
+    await BugReport.create(req.body);
     res.status(201).json({ message: "ok" });
   } catch (error) {
     console.log(error.message);
@@ -11,5 +11,5 @@ const createSuggestion = async (req, res) => {
 };
 
 module.exports = {
-  createSuggestion,
+  createReport,
 };
