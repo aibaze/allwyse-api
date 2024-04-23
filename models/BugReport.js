@@ -8,10 +8,6 @@ const BugReportSchema = mongoose.Schema({
   email: { type: String },
 });
 
-const BugReport = mongoose.model(
-  "BugReport",
-  BugReportSchema,
-  "betaSuggestion"
-);
+const BugReport = mongoose.model("BugReport", BugReportSchema, "bugReport");
 
 module.exports = { BugReportSchema, BugReport };
