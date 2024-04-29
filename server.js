@@ -12,6 +12,7 @@ const { leadRouter } = require("./entities/Lead/routes");
 const { studentRouter } = require("./entities/Student/routes");
 const { bugReportRouter } = require("./entities/BugReport/routes");
 const { requestRouter } = require("./entities/Request/routes");
+const { internalStatRouter } = require("./entities/InternalStats/routes");
 
 app.use(cors({ credentials: true, origin: true })); // to do = imrpove cors policy
 app.use(express.json());
@@ -30,6 +31,7 @@ app.use("/request", requestRouter);
 
 app.use("/lead", leadRouter);
 app.use("/bug-report", bugReportRouter);
+app.use("/internal-stat", internalStatRouter);
 
 moongose
   .connect(uri)
