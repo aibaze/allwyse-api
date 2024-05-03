@@ -7,6 +7,7 @@ const InternalStatsSchema = mongoose.Schema({
   ip: { type: String },
   ipVisitAmount: { type: Number },
   country: { type: String },
+  state: { type: String },
 });
 
 const InternalStat = mongoose.model(
