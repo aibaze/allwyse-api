@@ -2,7 +2,7 @@ const { InternalStat } = require("../../../models/InternalStats");
 const validator = require("validator");
 
 const createStat = async (req, res) => {
-  console.log("received");
+  console.log("received", req.body);
   try {
     let status = 201;
     const isValidIp = validator.isIP(req.body?.ip);
@@ -21,9 +21,11 @@ const createStat = async (req, res) => {
     } else {
       await InternalStat.create(req.body);
     }
+    res.setHeader("Cache-Control", "no-store");
 
     res.status(status).json({ message: "OK" });
   } catch (error) {
+    res.setHeader("Cache-Control", "no-store");
     console.log(error.message);
     res.status(500).json({ message: error.message });
   }
