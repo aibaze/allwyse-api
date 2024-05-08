@@ -32,6 +32,7 @@ const createStat = async (req, res) => {
 const getStats = async (req, res) => {
   try {
     const stats = await InternalStat.find();
+    res.setHeader("Cache-Control", "no-store");
     res.status(200).json(stats);
   } catch (error) {
     console.log(error.message);
