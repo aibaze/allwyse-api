@@ -25,7 +25,6 @@ const createStat = async (req, res) => {
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
 
-    z;
     res.status(status).json({ message: "OK" });
   } catch (error) {
     res.setHeader("Cache-Control", "no-store");
