@@ -86,6 +86,12 @@ const getCoach = async (req, res) => {
     const coach = await Coach.findOne(query).lean();
     const authorizationHeader = req.header("x_auth_token");
 
+    if (req.query.isLogin) {
+      Coach.updateOne(query, {
+        $set: { lastLogin: new Date().toISOString() },
+      });
+    }
+
     let minute = 60 * 1000;
     res.setHeader(
       "Set-Cookie",

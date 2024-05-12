@@ -11,7 +11,7 @@ const createStat = async (req, res) => {
     }
 
     const existingIp = await InternalStat.findOne({ ip: req.body?.ip });
-    console.log("existingIp", existingIp.ipVisitAmount);
+    console.log("existingIp", existingIp?.ipVisitAmount);
     if (existingIp) {
       status = 200;
       await InternalStat.updateOne(
