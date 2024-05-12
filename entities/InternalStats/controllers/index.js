@@ -2,7 +2,6 @@ const { InternalStat } = require("../../../models/InternalStats");
 const validator = require("validator");
 
 const createStat = async (req, res) => {
-  console.log("received", req.body.ip);
   try {
     let status = 201;
     const isValidIp = validator.isIP(req.body?.ip);
@@ -11,7 +10,6 @@ const createStat = async (req, res) => {
     }
 
     const existingIp = await InternalStat.findOne({ ip: req.body?.ip });
-    console.log("existingIp", existingIp?.ipVisitAmount);
     if (existingIp) {
       status = 200;
       await InternalStat.updateOne(
