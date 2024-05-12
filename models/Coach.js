@@ -62,15 +62,18 @@ const CoachSchema = mongoose.Schema(
         type: String,
       },
     },
-    students:[
+    students: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Student",
       },
     ],
-    reviews:{
-      type:{String} // to do create a schema for reviews
-    }
+    reviews: {
+      type: [String],
+    },
+    lastLogin: {
+      type: String,
+    },
   },
   {
     timestamps: true,
