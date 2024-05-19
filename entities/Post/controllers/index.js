@@ -13,9 +13,10 @@ const createPost = async (req, res) => {
     const body = {
       ...req.body,
       author: {
-        name: coach.profileInfo.name,
-        avatarUrl: coach.profileInfo.profileImg,
-        profileUrl: `www.allwyse/io/info/${coach.slug}`,
+        name: "Allwyse",
+        avatarUrl:
+          "https://www.allwyse.io/_next/image/?url=https%3A%2F%2Fi.ibb.co%2FBzGVbQ2%2FLogo-web-white-web.png&w=3840&q=75",
+        // profileUrl: `www.allwyse/io/info/${coach.slug}`,
       },
       comments: [],
       createdAt: new Date().toISOString(),
