@@ -2,6 +2,7 @@ const { ObjectId } = require("mongodb");
 const Coach = require("../../../models/Coach");
 const Service = require("../../../models/Service");
 const Event = require("../../../models/Event");
+const Student = require("../../../models/Student");
 const { MailtrapClient } = require("mailtrap");
 const cookie = require("cookie");
 const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
@@ -180,6 +181,7 @@ const logNewView = async (req, res) => {
   }
 };
 
+// una tabla de conversiones : guardar cada vez que un usuario crea un appointment
 const getCoachStats = async (req, res) => {
   try {
     const coachId = new ObjectId(req.params.id);
@@ -195,23 +197,53 @@ const getCoachStats = async (req, res) => {
       $gte: new Date(),
       $lte: endOfDay,
     };
-    const events = await Event.find({
+    const historicFiltes = {
+      $gte: new Date("2021-01-01T00:00:00.000Z"),
+      $lte: new Date(),
+    };
+
+    const clientsReq = await Student.find({ coachId });
+    const historicEventsReq = await Event.find({
+      coachId: req.params.coachId,
+      startDate: historicFiltes,
+    }).count();
+    const eventsReq = await Event.find({
       coachId: req.params.coachId,
       startDate: dateWeekFilters,
     });
-    const eventsLeftToday = await Event.find({
+    const eventsLeftTodayReq = await Event.find({
       coachId: req.params.coachId,
       startDate: dayFilters,
     });
 
-    const services = await Service.find({ _id: coachId }).lean();
+    const servicesReq = await Service.find({ _id: coachId }).lean();
+
+    const [clients, historicEvents, events, eventsLeftToday, services] =
+      await Promise.all([
+        clientsReq,
+        historicEventsReq,
+        eventsReq,
+        eventsLeftTodayReq,
+        servicesReq,
+      ]);
+
     let servicesStats = {
+      services: [],
       uniqueVisits: 0,
       totalVisits: 0,
     };
 
     services.forEach((service) => {
       servicesStats = {
+        byServices: [
+          ...servicesStats.services,
+          {
+            serviceId: service._id,
+            title: service.title,
+            uniqueVisits: service.profileViews.uniqueVisits,
+            totalVisits: service.profileViews.totalVisits,
+          },
+        ],
         uniqueVisits:
           servicesStats.uniqueVisits + service.profileViews.uniqueVisits,
         totalVisits:
@@ -221,8 +253,11 @@ const getCoachStats = async (req, res) => {
     const stats = {
       uniqueVisits: coach.profileViews.uniqueVisits,
       totalVisits: coach.profileViews.totalVisits,
-      appointmentsThisWeek: events.length,
+      appointmentsThisWeek: events,
       eventsLeftToday: eventsLeftToday.length,
+      clients: clients.length,
+      totalAmountOfAppointmentsToDate: historicEvents,
+      servicesStats,
     };
     res.status(200).json({ ...stats });
   } catch (error) {
@@ -230,6 +265,7 @@ const getCoachStats = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 module.exports = {
   updateCoach,
   createCoach,
