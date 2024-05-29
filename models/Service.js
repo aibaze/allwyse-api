@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const ServiceSchema = mongoose.Schema(
   {
@@ -35,11 +35,21 @@ const ServiceSchema = mongoose.Schema(
     skillsLearned: {
       type: [String] /* ? */,
     },
+    profileViews: {
+      uniqueVisits: {
+        type: Number,
+        default: 0,
+      },
+      totalVisits: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
   {
     timestamps: true,
   }
 );
-const Service = mongoose.model("Service", ServiceSchema)
+const Service = mongoose.model("Service", ServiceSchema);
 
-module.exports = {ServiceSchema,Service}
+module.exports = { ServiceSchema, Service };

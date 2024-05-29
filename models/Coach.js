@@ -74,6 +74,16 @@ const CoachSchema = mongoose.Schema(
     lastLogin: {
       type: String,
     },
+    profileViews: {
+      uniqueVisits: {
+        type: Number,
+        default: 0,
+      },
+      totalVisits: {
+        type: Number,
+        default: 0,
+      },
+    },
   },
   {
     timestamps: true,

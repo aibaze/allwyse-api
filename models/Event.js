@@ -5,10 +5,16 @@ const EventSchema = mongoose.Schema({
     type: String,
   },
   color: {
-    type: String ,
+    type: String,
   },
   sendEmail: {
     type: Boolean,
+  },
+  createdAt: {
+    type: Date,
+  },
+  startDate: {
+    type: Date,
   },
   start: {
     type: Number,
@@ -16,8 +22,8 @@ const EventSchema = mongoose.Schema({
   end: {
     type: Number,
   },
-  duration:{
-    type: Number
+  duration: {
+    type: Number,
   },
   studentEmail: {
     type: String,

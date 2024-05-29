@@ -1,10 +1,26 @@
 const { ObjectId } = require("mongodb");
 const Coach = require("../../../models/Coach");
+const Service = require("../../../models/Service");
+const Event = require("../../../models/Event");
 const { MailtrapClient } = require("mailtrap");
 const cookie = require("cookie");
+const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
+
+function slugify(name) {
+  return name
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-") // Replace spaces with -
+    .replace(/[^\w\-]+/g, "") // Remove all non-word characters
+    .replace(/\-\-+/g, "-") // Replace multiple - with single -
+    .replace(/^-+/, "") // Trim - from start of text
+    .replace(/-+$/, ""); // Trim - from end of text
+}
+
 const createSlug = (firstName, lastName) => {
-  const rawSlug = `${firstName?.toLowerCase()}-${lastName?.toLowerCase()}`;
-  return rawSlug.replace(/ /g, "-");
+  const slug = `${slugify(firstName)}-${slugify(lastName)}`;
+  return slug;
 };
 
 const createCoach = async (req, res) => {
@@ -15,7 +31,6 @@ const createCoach = async (req, res) => {
     };
     const coach = await Coach.create(body);
     const TOKEN = process.env.EMAIL_API_KEY;
-    console.log(TOKEN, "line 18");
     const client = new MailtrapClient({ token: TOKEN });
     await client.send({
       from: { email: "info@allwyse.io" },
@@ -138,10 +153,89 @@ const deleteCoach = async (req, res) => {
   }
 };
 
+const logNewView = async (req, res) => {
+  try {
+    const isFirstVisit = req.body.firstVisit;
+    const coachId = new ObjectId(req.body.coachId);
+    const currentCoach = await Coach.findOne({ _id: coachId });
+
+    const body = {
+      uniqueVisits: isFirstVisit
+        ? currentCoach.profileViews.uniqueVisits + 1
+        : currentCoach.profileViews.uniqueVisits,
+      totalVisits: currentCoach.profileViews.totalVisits + 1,
+    };
+
+    await Coach.updateOne(
+      { _id: coachId },
+      {
+        profileViews: body,
+      }
+    );
+
+    res.status(201).json({ message: "OK" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getCoachStats = async (req, res) => {
+  try {
+    const coachId = new ObjectId(req.params.id);
+    const coach = await Coach.findOne({ _id: coachId }).lean();
+
+    const { weekStartDate, weekEndDate } = getCurrentWeek();
+    const { endOfDay } = getCurrentDayBounds();
+    const dateWeekFilters = {
+      $gte: weekStartDate,
+      $lte: weekEndDate,
+    };
+    const dayFilters = {
+      $gte: new Date(),
+      $lte: endOfDay,
+    };
+    const events = await Event.find({
+      coachId: req.params.coachId,
+      startDate: dateWeekFilters,
+    });
+    const eventsLeftToday = await Event.find({
+      coachId: req.params.coachId,
+      startDate: dayFilters,
+    });
+
+    const services = await Service.find({ _id: coachId }).lean();
+    let servicesStats = {
+      uniqueVisits: 0,
+      totalVisits: 0,
+    };
+
+    services.forEach((service) => {
+      servicesStats = {
+        uniqueVisits:
+          servicesStats.uniqueVisits + service.profileViews.uniqueVisits,
+        totalVisits:
+          servicesStats.totalVisits + service.profileViews.totalVisits,
+      };
+    });
+    const stats = {
+      uniqueVisits: coach.profileViews.uniqueVisits,
+      totalVisits: coach.profileViews.totalVisits,
+      appointmentsThisWeek: events.length,
+      eventsLeftToday: eventsLeftToday.length,
+    };
+    res.status(200).json({ ...stats });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   updateCoach,
   createCoach,
   getCoach,
   deleteCoach,
   getCoachBySlug,
+  logNewView,
+  getCoachStats,
 };
