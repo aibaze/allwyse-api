@@ -202,21 +202,21 @@ const getCoachStats = async (req, res) => {
       $lte: new Date(),
     };
 
-    const clientsReq = await Student.find({ coachId });
-    const historicEventsReq = await Event.find({
+    const clientsReq = Student.find({ coachId });
+    const historicEventsReq = Event.find({
       coachId: req.params.coachId,
       startDate: historicFiltes,
     }).count();
-    const eventsReq = await Event.find({
+    const eventsReq = Event.find({
       coachId: req.params.coachId,
       startDate: dateWeekFilters,
     });
-    const eventsLeftTodayReq = await Event.find({
+    const eventsLeftTodayReq = Event.find({
       coachId: req.params.coachId,
       startDate: dayFilters,
     });
 
-    const servicesReq = await Service.find({ _id: coachId }).lean();
+    const servicesReq = Service.find({ _id: coachId }).lean();
 
     const [clients, historicEvents, events, eventsLeftToday, services] =
       await Promise.all([
@@ -244,12 +244,13 @@ const getCoachStats = async (req, res) => {
             totalVisits: service.profileViews.totalVisits,
           },
         ],
-        uniqueVisits:
+        combinedUniqueVisits:
           servicesStats.uniqueVisits + service.profileViews.uniqueVisits,
-        totalVisits:
+        combinedTotalVisits:
           servicesStats.totalVisits + service.profileViews.totalVisits,
       };
     });
+
     const stats = {
       uniqueVisits: coach.profileViews.uniqueVisits,
       totalVisits: coach.profileViews.totalVisits,
