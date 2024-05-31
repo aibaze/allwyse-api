@@ -216,7 +216,9 @@ const getCoachStats = async (req, res) => {
       startDate: dayFilters,
     });
 
-    const servicesReq = Service.find({ _id: { $in: [coach.services] } }).lean();
+    const servicesReq = Service.find({
+      _id: { $in: [...coach.services] },
+    }).lean();
 
     const [clients, historicEvents, events, eventsLeftToday, services] =
       await Promise.all([
