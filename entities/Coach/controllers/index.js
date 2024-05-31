@@ -1,8 +1,8 @@
 const { ObjectId } = require("mongodb");
 const Coach = require("../../../models/Coach");
-const Service = require("../../../models/Service");
-const Event = require("../../../models/Event");
-const Student = require("../../../models/Student");
+const { Service } = require("../../../models/Service");
+const { Event } = require("../../../models/Event");
+const { Student } = require("../../../models/Student");
 const { MailtrapClient } = require("mailtrap");
 const cookie = require("cookie");
 const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
