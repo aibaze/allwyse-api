@@ -245,15 +245,15 @@ const getCoachStats = async (req, res) => {
           },
         ],
         combinedUniqueVisits:
-          servicesStats.uniqueVisits + service.profileViews.uniqueVisits,
+          servicesStats.uniqueVisits + service.profileViews?.uniqueVisits ?? 0,
         combinedTotalVisits:
-          servicesStats.totalVisits + service.profileViews.totalVisits,
+          servicesStats.totalVisits + service.profileViews?.totalVisits ?? 0,
       };
     });
 
     const stats = {
-      uniqueVisits: coach.profileViews.uniqueVisits,
-      totalVisits: coach.profileViews.totalVisits,
+      uniqueVisits: coach.profileViews?.uniqueVisits ?? 0,
+      totalVisits: coach.profileViews?.totalVisits ?? 0,
       appointmentsThisWeek: events,
       eventsLeftToday: eventsLeftToday.length,
       clients: clients.length,
