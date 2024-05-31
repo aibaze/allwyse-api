@@ -35,6 +35,10 @@ const ServiceSchema = mongoose.Schema(
     skillsLearned: {
       type: [String] /* ? */,
     },
+    coachId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Coach",
+    },
     profileViews: {
       uniqueVisits: {
         type: Number,

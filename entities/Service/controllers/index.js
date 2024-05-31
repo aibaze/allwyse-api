@@ -5,7 +5,7 @@ const { ObjectId } = require("mongodb");
 const createService = async (req, res) => {
   try {
     const { coachId } = req.params;
-    const newService = await Service.create(req.body);
+    const newService = await Service.create({ ...req.body, coachId });
 
     await Coach.updateOne(
       { _id: new ObjectId(coachId) },
