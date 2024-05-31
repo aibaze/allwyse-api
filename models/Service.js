@@ -5,35 +5,43 @@ const ServiceSchema = mongoose.Schema(
     title: {
       type: String,
     },
-    category: {
-      type: String,
-    },
-    shortDescription: {
-      type: String,
-    },
     description: {
       type: String,
     },
-    serviceType: {
+    workDays: {
+      type: [String],
+    },
+
+    sessionDuration: {
+      type: String /* ? */,
+    },
+    sessionPeriodicity: {
       type: String /* hourly | course | other */,
     },
     price: {
       type: String /* ? */,
     },
-    studentAmount: {
+    previousPrice: {
       type: String /* ? */,
     },
-    certificatedAs: {
-      type: String /* ? */,
+
+    hidePrice: {
+      type: Boolean /* ? */,
     },
-    serviceLength: {
-      type: String /* ? */,
-    },
-    studentTarget: {
+    mainTopics: {
       type: [String] /* ? */,
     },
-    skillsLearned: {
+    languages: {
       type: [String] /* ? */,
+    },
+    tags: {
+      type: [String] /* ? */,
+    },
+    published: {
+      type: Boolean /* ? */,
+    },
+    seatsLeft: {
+      type: Number /* ? */,
     },
     coachId: {
       type: mongoose.Schema.Types.ObjectId,

@@ -242,8 +242,8 @@ const getCoachStats = async (req, res) => {
           {
             serviceId: service._id,
             title: service.title,
-            uniqueVisits: service.profileViews.uniqueVisits,
-            totalVisits: service.profileViews.totalVisits,
+            uniqueVisits: service.profileViews?.uniqueVisits,
+            totalVisits: service.profileViews?.totalVisits,
           },
         ],
         combinedUniqueVisits:
