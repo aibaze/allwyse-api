@@ -38,6 +38,20 @@ const updateService = async (req, res) => {
   }
 };
 
+const getServiceById = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const service = await Service.findOne({
+      _id: new ObjectId(serviceId),
+    });
+
+    res.status(200).json({ service: service });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const deleteService = async (req, res) => {
   try {
     const { coachId, serviceId } = req.params;
@@ -135,4 +149,5 @@ module.exports = {
   updateService,
   logNewView,
   getServiceStats,
+  getServiceById
 };

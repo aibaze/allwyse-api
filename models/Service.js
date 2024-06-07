@@ -23,7 +23,7 @@ const ServiceSchema = mongoose.Schema(
     price: {
       type: String /* ? */,
     },
-    previousPrice: {
+    salePrice: {
       type: String /* ? */,
     },
 
