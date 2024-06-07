@@ -11,9 +11,11 @@ const ServiceSchema = mongoose.Schema(
     workDays: {
       type: [String],
     },
-
     sessionDuration: {
       type: String /* ? */,
+    },
+    customSessionMinutes: {
+      type: Number,
     },
     sessionPeriodicity: {
       type: String /* hourly | course | other */,
@@ -38,6 +40,9 @@ const ServiceSchema = mongoose.Schema(
       type: [String] /* ? */,
     },
     published: {
+      type: Boolean /* ? */,
+    },
+    discount: {
       type: Boolean /* ? */,
     },
     seatsLeft: {
