@@ -8,6 +8,15 @@ const ServiceSchema = mongoose.Schema(
     description: {
       type: String,
     },
+    category: {
+      type: String,
+    },
+    image: {
+      type: String,
+    },
+    thumb: {
+      type: String,
+    },
     workDays: {
       type: [String],
     },
