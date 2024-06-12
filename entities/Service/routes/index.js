@@ -18,7 +18,7 @@ serviceRouter.post(
   createService
 );
 serviceRouter.put("/:serviceId", authMiddleware, updateService);
-serviceRouter.get("/:serviceId", authMiddleware, getServiceById);
+serviceRouter.get("/:serviceId", getServiceById);
 serviceRouter.delete(
   "/:serviceId/coach/:coachId",
   authMiddleware,
