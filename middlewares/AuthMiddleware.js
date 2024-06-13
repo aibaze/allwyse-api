@@ -1,6 +1,6 @@
 const jsonwebtoken = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
-const jsonWebKeys = {
+const jsonWebKeysDev = {
   keys: [
     {
       alg: "RS256",
@@ -20,6 +20,30 @@ const jsonWebKeys = {
     },
   ],
 };
+
+const jsonWebKeysProd = {
+  keys: [
+    {
+      alg: "RS256",
+      e: "AQAB",
+      kid: "JvPgbBPxfxaqELAI/c++ILt/5sCYEeTM0DL/zHC35sA=",
+      kty: "RSA",
+      n: "sKCDgvmVLa_zImef2SgInIP6dUBEoS9HFovbJdXAL1_AoqrZPahMeXoDydlZgjweNtK9s1aIGxh4p5dAGnqLC0zl8hwOg7AIHKIvqTtFlFaYGOdyYbDMwTq9pi9I5CKfSP6R5ZqQnenFeYvOLq0lV_pmQYYfNe8t4JmADl77QgJwpYfZJqWl7Qfc8wdgqLAyHmFTXIobjFIFQU_ZDbFsz7RYV65x6jRvxLBYCvD-DrRPfhWvn4LYYRE-seaR0RbtrYApYnGT7TrULUnhwkH3kp7svBOa47I1--UcEsls5PUQUYXhdZs8S61ez229Qr4fuiR581igPcw6aktDFmwyxw",
+      use: "sig",
+    },
+    {
+      alg: "RS256",
+      e: "AQAB",
+      kid: "2wYWAq5V92pJZVlul4d2jsyC/VqAdJ+O5xYb/EiFClI=",
+      kty: "RSA",
+      n: "vzRqflo6zjaDMnRCBqMJJIeI4qJJ_ppIjVAiQDs8_cX118FImM75IitJl3266AH5NcPMO-tL27W1NlCq9aU4o7v1hZPFOf25jPphAQgjGd9Mluv01PlsaM4XxvX1xGU7EjCKrPUIdFNOq9DS7DulIxDcULc-JdEjLgsWYaF0Oy7oiGuIFMikRHIZSsXqm5DyvWplcezFSd9DSxHXAkI6n9iyThmh97Eo-zhxivxzko_3zqLhI15esmEg2Gb-l-gBeG2pwyuC8xJyeQ_ciiuEJnNKSTBTfgqmvV-DXLj61Gi6BdII3jPtMEPU8QScukX7kN3xA8yH8Y3Qu0boeQrx7w",
+      use: "sig",
+    },
+  ],
+};
+
+const jsonWebKeys =
+  process.env.ENVIRONMENT === "prod" ? jsonWebKeysProd : jsonWebKeysDev;
 
 function decodeTokenHeader(token) {
   const [headerEncoded] = token.split(".");
