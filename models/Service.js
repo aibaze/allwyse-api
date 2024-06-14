@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ReviewSchema } = require("./Review");
 
 const ServiceSchema = mongoose.Schema(
   {
@@ -60,6 +61,9 @@ const ServiceSchema = mongoose.Schema(
     coachId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Coach",
+    },
+    reviews: {
+      type: [ReviewSchema],
     },
     views: {
       uniqueVisits: {
