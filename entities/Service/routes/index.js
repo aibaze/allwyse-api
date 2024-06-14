@@ -6,6 +6,7 @@ const {
   updateService,
   logNewView,
   getServiceStats,
+  updateServiceReviews,
   getServiceById,
 } = require("../controllers");
 const serviceRouter = express.Router();
@@ -27,6 +28,7 @@ serviceRouter.delete(
 
 // PUBLIC ROUTES
 serviceRouter.get("/coach/:coachId", getServicesByCoachId);
+serviceRouter.put("/reviews/:serviceId", updateServiceReviews);
 
 serviceRouter.post("/visit", logNewView);
 serviceRouter.get("/stats/:coachId", getServiceStats);

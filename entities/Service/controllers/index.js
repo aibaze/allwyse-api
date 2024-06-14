@@ -25,14 +25,45 @@ const createService = async (req, res) => {
 
 const updateService = async (req, res) => {
   try {
-    // agregar que solo pueda editarlo si el req.user.id es igual al coachId
+    const { email } = req.loggedUser;
     const { serviceId } = req.params;
+
+    const coachReq = Coach.findOne({ email });
+    const serviceReq = Service.findOne({ _id: new ObjectId(serviceId) });
+    const [coach, service] = await Promise.all([coachReq, serviceReq]);
+
+    if (!coach || !service) {
+      return res.status(404).json({ message: "Not found" });
+    }
+
+    if (coach?._id?.toString() !== service.coachId?.toString()) {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
     const updatedService = await Service.updateOne(
       { _id: new ObjectId(serviceId) },
       { $set: req.body }
     );
 
     res.status(200).json({ service: updatedService });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const updateServiceReviews = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+
+    await Service.updateOne(
+      { _id: new ObjectId(serviceId) },
+      { $set: { reviews: req.body.reviews } }
+    );
+
+    const service = await Service.findOne({ _id: new ObjectId(serviceId) });
+
+    res.status(200).json({ service });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
@@ -151,4 +182,5 @@ module.exports = {
   logNewView,
   getServiceStats,
   getServiceById,
+  updateServiceReviews,
 };
