@@ -25,6 +25,7 @@ const createService = async (req, res) => {
 
 const updateService = async (req, res) => {
   try {
+    // agregar que solo pueda editarlo si el req.user.id es igual al coachId
     const { serviceId } = req.params;
     const updatedService = await Service.updateOne(
       { _id: new ObjectId(serviceId) },
@@ -149,5 +150,5 @@ module.exports = {
   updateService,
   logNewView,
   getServiceStats,
-  getServiceById
+  getServiceById,
 };

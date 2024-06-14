@@ -61,7 +61,7 @@ const ServiceSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Coach",
     },
-    profileViews: {
+    views: {
       uniqueVisits: {
         type: Number,
         default: 0,
