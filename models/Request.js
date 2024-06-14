@@ -24,6 +24,9 @@ const RequestSchema = mongoose.Schema(
     type: {
       type: String,
     },
+    priority: {
+      type: String,
+    },
     message: {
       type: String,
     },
@@ -34,6 +37,12 @@ const RequestSchema = mongoose.Schema(
     isStarred: {
       type: Boolean,
       default: false,
+    },
+    requestedDate: {
+      type: String,
+    },
+    requestedTime: {
+      type: String,
     },
   },
   {
