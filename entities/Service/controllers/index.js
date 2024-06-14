@@ -58,7 +58,11 @@ const updateServiceReviews = async (req, res) => {
 
     await Service.updateOne(
       { _id: new ObjectId(serviceId) },
-      { $set: { reviews: req.body.reviews } }
+      {
+        $push: {
+          reviews: req.body.newReview,
+        },
+      }
     );
 
     const service = await Service.findOne({ _id: new ObjectId(serviceId) });
