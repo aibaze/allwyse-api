@@ -6,6 +6,9 @@ const RequestSchema = mongoose.Schema(
     coachId: {
       type: mongoose.Schema.Types.ObjectId,
     },
+    serviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+    },
     subject: {
       type: String,
     },
