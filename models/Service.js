@@ -64,6 +64,7 @@ const ServiceSchema = mongoose.Schema(
     },
     reviews: {
       type: [ReviewSchema],
+      default: [],
     },
     views: {
       uniqueVisits: {
