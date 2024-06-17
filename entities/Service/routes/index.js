@@ -8,6 +8,7 @@ const {
   getServiceStats,
   updateServiceReviews,
   getServiceById,
+  updateServiceViews,
 } = require("../controllers");
 const serviceRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
@@ -29,6 +30,7 @@ serviceRouter.delete(
 // PUBLIC ROUTES
 serviceRouter.get("/coach/:coachId", getServicesByCoachId);
 serviceRouter.put("/reviews/:serviceId", updateServiceReviews);
+serviceRouter.put("/views/:serviceId", updateServiceViews);
 
 serviceRouter.post("/visit", logNewView);
 serviceRouter.get("/stats/:coachId", getServiceStats);

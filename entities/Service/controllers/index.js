@@ -23,6 +23,28 @@ const createService = async (req, res) => {
   }
 };
 
+const updateServiceViews = async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+
+    await Service.updateOne(
+      { _id: new ObjectId(serviceId) },
+      {
+        $set: {
+          views: req.body.views,
+        },
+      }
+    );
+
+    const service = await Service.findOne({ _id: new ObjectId(serviceId) });
+
+    res.status(200).json({ service });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const updateService = async (req, res) => {
   try {
     const { email } = req.loggedUser;
@@ -187,4 +209,5 @@ module.exports = {
   getServiceStats,
   getServiceById,
   updateServiceReviews,
+  updateServiceViews,
 };
