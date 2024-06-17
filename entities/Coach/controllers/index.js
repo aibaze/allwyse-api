@@ -97,7 +97,7 @@ const getCoach = async (req, res) => {
   try {
     const isEmail =
       req.params.id.includes("@") || req.params.id.includes(".com");
-    console.log(isEmail, "isEmail");
+    console.log(isEmail, "isEmail", req.params.id);
     const query = isEmail
       ? { email: req.params.id }
       : { _id: new ObjectId(req.params.id) };
