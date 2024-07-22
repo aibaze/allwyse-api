@@ -4,6 +4,7 @@ const dayjs = require("dayjs");
 const { Event } = require("../../../models/Event");
 const { GoogleInfo } = require("../../../models/GoogleInfo");
 const { ObjectId } = require("mongodb");
+const { Student } = require("../../../models/Student");
 
 const auth2Client = new google.auth.OAuth2(
   process.env.CALENAR_CLIENT_KEY,
@@ -51,8 +52,13 @@ const createEvent = async (req, res) => {
     }); */
     googleError = false;
 
+    const student = await Student.findOne({
+      email: req.body.studentEmail,
+      coachId: new ObjectId(req.body.coachId),
+    });
     const event = await Event.create({
       ...req.body,
+      studentId: student?._id,
       startDate: new Date(req.body.start),
       createdAt: new Date(),
       title: `${req.body.studentName} (${req.body.description})`,
