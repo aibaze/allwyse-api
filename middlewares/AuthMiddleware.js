@@ -90,9 +90,13 @@ const authMiddleware = (req, res, next) => {
       .status(401)
       .json({ error: true, message: "Authorization token not found" });
   }
-
+  console.log({ token });
   const header = decodeTokenHeader(token);
+  console.log({ header });
+
   const jsonWebKey = getJsonWebKeyWithKID(header.kid);
+  console.log({ jsonWebKey });
+
   verifyJsonWebTokenSignature(token, jsonWebKey, (err, decodedToken) => {
     if (err?.expiredAt) {
       return res.status(401).json({ error: true, message: "Invalid token" });
