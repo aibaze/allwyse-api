@@ -29,12 +29,31 @@ const EventSchema = mongoose.Schema({
     type: String,
   },
   studentId: {
-    type: mongoose.Types.ObjectId,
+    type: Schema.Types.Mixed,
+    validate: {
+      validator: function (value) {
+        return mongoose.Types.ObjectId.isValid(value) || value === "";
+      },
+      message: (props) =>
+        `${props.value} is not a valid ObjectId or empty string!`,
+    },
+    default: "",
   },
   studentName: {
     type: String,
   },
-  serviceId: { type: mongoose.Types.ObjectId },
+  serviceId: {
+    type: Schema.Types.Mixed,
+    validate: {
+      validator: function (value) {
+        // Permitir ObjectId y cadenas vacías
+        return mongoose.Types.ObjectId.isValid(value) || value === "";
+      },
+      message: (props) =>
+        `${props.value} is not a valid ObjectId or empty string!`,
+    },
+    default: "",
+  },
   coachId: { type: mongoose.Types.ObjectId },
 });
 
