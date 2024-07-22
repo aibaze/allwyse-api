@@ -29,7 +29,7 @@ const EventSchema = mongoose.Schema({
     type: String,
   },
   studentId: {
-    type: Schema.Types.Mixed,
+    type: mongoose.Schema.Types.Mixed,
     validate: {
       validator: function (value) {
         return mongoose.Types.ObjectId.isValid(value) || value === "";
@@ -43,7 +43,7 @@ const EventSchema = mongoose.Schema({
     type: String,
   },
   serviceId: {
-    type: Schema.Types.Mixed,
+    type: mongoose.Schema.Types.Mixed,
     validate: {
       validator: function (value) {
         // Permitir ObjectId y cadenas vacías
