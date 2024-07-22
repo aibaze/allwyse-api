@@ -18,15 +18,15 @@ const calendar = google.calendar({
 const createEvent = async (req, res) => {
   let googleError = true;
   try {
-    const { attendees, userTimeZone, start, end, title, description, coachId } =
-      req.body;
-    const googleInfo = await GoogleInfo.findOne({
+    /*    const { attendees, userTimeZone, start, end, title, description, coachId } =
+      req.body; */
+    /*   const googleInfo = await GoogleInfo.findOne({
       coachId: new ObjectId(coachId),
-    });
+    }); */
 
-    auth2Client.setCredentials({ refresh_token: googleInfo?.token });
-
-    await calendar.events.insert({
+    /*     auth2Client.setCredentials({ refresh_token: googleInfo?.token });
+     */
+    /*     await calendar.events.insert({
       calendarId: "primary",
       auth: auth2Client,
       conferenceDataVersion: 1,
@@ -48,7 +48,7 @@ const createEvent = async (req, res) => {
         },
         attendees: attendees,
       },
-    });
+    }); */
     googleError = false;
 
     const event = await Event.create({
