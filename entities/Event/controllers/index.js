@@ -51,14 +51,17 @@ const createEvent = async (req, res) => {
       },
     }); */
     googleError = false;
-
-    const student = await Student.findOne({
-      email: req.body.studentEmail,
-      coachId: new ObjectId(req.body.coachId),
-    });
+    let studentId = "";
+    try {
+      const student = await Student.findOne({
+        email: req.body.studentEmail,
+        coachId: new ObjectId(req.body.coachId),
+      });
+      studentId = student._id;
+    } catch (error) {}
     const event = await Event.create({
       ...req.body,
-      studentId: student?._id,
+      studentId: studentId,
       startDate: new Date(req.body.start),
       createdAt: new Date(),
       title: `${req.body.studentName} (${req.body.description})`,
