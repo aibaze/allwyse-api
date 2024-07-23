@@ -62,7 +62,7 @@ const createEvent = async (req, res) => {
     const event = await Event.create({
       ...req.body,
       studentId: studentId,
-      startDate: new Date(req.body.start),
+      startDate: req.body.startDate || new Date(req.body.start),
       createdAt: new Date(),
       title: `${req.body.studentName} (${req.body.description})`,
     });
