@@ -46,7 +46,7 @@ const updateServiceViews = async (req, res) => {
 
 const updateService = async (req, res) => {
   try {
-    const { email } = req.loggedUser;
+    const email = req.loggedUser.email || req.loggedUser;
     const { serviceId } = req.params;
 
     const coachReq = Coach.findOne({ email });

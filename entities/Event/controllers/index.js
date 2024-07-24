@@ -18,10 +18,11 @@ const calendar = google.calendar({
 
 const createEvent = async (req, res) => {
   let googleError = true;
-  const { email } = req.loggedUser;
+  const email = req.loggedUser.email || req.loggedUser;
 
   try {
     if (email.includes("soytomasgoldenberg")) {
+      console.log("Creating google event for coach");
       const {
         attendees,
         userTimeZone,
