@@ -25,9 +25,9 @@ const handleUniqueSlug = async (existingSlug) => {
 
   while (!validSlug) {
     const newSlug = `${existingSlug}${number}`;
-    const existingSlug = await Coach.findOne({ slug: newSlug });
+    const slugInDb = await Coach.findOne({ slug: newSlug });
 
-    if (!existingSlug) {
+    if (!slugInDb) {
       validSlug = newSlug;
       return newSlug;
     } else {
