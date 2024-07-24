@@ -106,16 +106,20 @@ const checkIfItsAuth = async (req, res) => {
   res.json({ message: "OK", error: null });
 };
 const googleAuth = async (req, res) => {
-  const { tokens } = await auth2Client.getToken(req.body.code);
-  const body = {
-    token: tokens.refresh_token,
-    expiresIn: tokens.expiry_date,
-    coachId: req.body.coachId,
-  };
-
-  await GoogleInfo.deleteMany({ coachId: req.body.coachId });
-  await GoogleInfo.create(body);
-  res.json({ message: "ok", error: null });
+  try {
+    const { tokens } = await auth2Client.getToken(req.body.code);
+    const body = {
+      token: tokens.refresh_token,
+      expiresIn: tokens.expiry_date,
+      coachId: req.body.coachId,
+    };
+    console.log(tokens);
+    await GoogleInfo.deleteMany({ coachId: req.body.coachId });
+    await GoogleInfo.create(body);
+    res.json({ message: "ok", error: null });
+  } catch (error) {
+    res.json({ message: error.message, error: true });
+  }
 };
 
 const getPublicEventsByCoach = async (req, res) => {
