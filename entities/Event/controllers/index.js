@@ -17,7 +17,7 @@ const calendar = google.calendar({
 });
 
 const createEvent = async (req, res) => {
-  let googleError = true;
+  let googleError = false; //true;
   const email = req.loggedUser.email || req.loggedUser;
 
   try {
