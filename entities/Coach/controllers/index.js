@@ -54,7 +54,7 @@ const createCoach = async (req, res) => {
     let slug = createSlug(req.body.firstName, req.body.lastName);
     const existingSlug = await Coach.findOne({ slug });
     if (existingSlug) {
-      slug = handleUniqueSlug(slug);
+      slug = await handleUniqueSlug(slug);
     }
     const body = {
       ...req.body,
