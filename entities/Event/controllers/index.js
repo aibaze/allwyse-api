@@ -19,37 +19,47 @@ const calendar = google.calendar({
 const createEvent = async (req, res) => {
   let googleError = true;
   try {
-    /*    const { attendees, userTimeZone, start, end, title, description, coachId } =
-      req.body; */
-    /*   const googleInfo = await GoogleInfo.findOne({
-      coachId: new ObjectId(coachId),
-    }); */
+    if (req.query.googleEvent) {
+      const {
+        attendees,
+        userTimeZone,
+        start,
+        end,
+        title,
+        description,
+        coachId,
+      } = req.body;
+      const googleInfo = await GoogleInfo.findOne({
+        coachId: new ObjectId(coachId),
+      });
 
-    /*     auth2Client.setCredentials({ refresh_token: googleInfo?.token });
-     */
-    /*     await calendar.events.insert({
-      calendarId: "primary",
-      auth: auth2Client,
-      conferenceDataVersion: 1,
-      requestBody: {
-        summary: title,
-        description: description,
-        start: {
-          dateTime: dayjs(start),
-          timeZone: userTimeZone,
-        },
-        end: {
-          dateTime: dayjs(end),
-          timeZone: userTimeZone,
-        },
-        conferenceData: {
-          createRequest: {
-            requestId: uuid(),
+      auth2Client.setCredentials({ refresh_token: googleInfo?.token });
+
+      await calendar.events.insert({
+        calendarId: "primary",
+        auth: auth2Client,
+        conferenceDataVersion: 1,
+        requestBody: {
+          summary: title,
+          description: description,
+          start: {
+            dateTime: dayjs(start),
+            timeZone: userTimeZone,
           },
+          end: {
+            dateTime: dayjs(end),
+            timeZone: userTimeZone,
+          },
+          conferenceData: {
+            createRequest: {
+              requestId: uuid(),
+            },
+          },
+          attendees: attendees,
         },
-        attendees: attendees,
-      },
-    }); */
+      });
+    }
+
     googleError = false;
     let studentId = "";
     try {
