@@ -19,6 +19,24 @@ function slugify(name) {
     .replace(/-+$/, ""); // Trim - from end of text
 }
 
+const handleUniqueSlug = async (existingSlug) => {
+  let number = 1;
+  let validSlug = "";
+
+  while (!validSlug) {
+    const newSlug = `${existingSlug}${number}`;
+    const existingSlug = await Coach.findOne({ slug: newSlug });
+
+    if (!existingSlug) {
+      validSlug = newSlug;
+      return newSlug;
+    } else {
+      number++;
+    }
+  }
+  return validSlug;
+};
+
 const createSlug = (firstName, lastName) => {
   const slug = `${slugify(firstName)}-${slugify(lastName)}`;
   return slug;
@@ -26,9 +44,21 @@ const createSlug = (firstName, lastName) => {
 
 const createCoach = async (req, res) => {
   try {
+    const existingCoach = await Coach.findOne({ email: req.body.email });
+    if (existingCoach) {
+      throw new Error(
+        `Another account with ${req.body.email} email has already been taken`
+      );
+    }
+
+    let slug = createSlug(req.body.firstName, req.body.lastName);
+    const existingSlug = await Coach.findOne({ slug });
+    if (existingSlug) {
+      slug = handleUniqueSlug(slug);
+    }
     const body = {
       ...req.body,
-      slug: createSlug(req.body.firstName, req.body.lastName),
+      slug,
     };
     const coach = await Coach.create(body);
     const TOKEN = process.env.EMAIL_API_KEY;
