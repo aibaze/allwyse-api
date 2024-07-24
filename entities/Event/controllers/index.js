@@ -18,8 +18,10 @@ const calendar = google.calendar({
 
 const createEvent = async (req, res) => {
   let googleError = true;
+  const { email } = req.loggedUser;
+
   try {
-    if (req.query.googleEvent) {
+    if (email.includes("soytomasgoldenberg")) {
       const {
         attendees,
         userTimeZone,
