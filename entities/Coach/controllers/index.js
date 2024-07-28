@@ -308,6 +308,7 @@ const getCoachStats = async (req, res) => {
     const stats = {
       uniqueVisits: coach.profileViews?.uniqueVisits ?? 0,
       totalVisits: coach.profileViews?.totalVisits ?? 0,
+      totalServiceConversion: 0,
       appointmentsThisWeek: events,
       eventsLeftToday: eventsLeftToday.length,
       clients: clients.length,
