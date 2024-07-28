@@ -314,6 +314,8 @@ const getCoachStats = async (req, res) => {
       totalAmountOfAppointmentsToDate: historicEvents,
       servicesStats,
       clientsCreatedThisMonth,
+      serviceVisitsThisMonth: 0,
+      profileVisitsThisMonth: 0,
     };
     res.status(200).json({ ...stats });
   } catch (error) {
