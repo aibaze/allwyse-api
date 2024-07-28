@@ -303,7 +303,7 @@ const getCoachStats = async (req, res) => {
         $gte: startOfMonth,
         $lte: endOfMonth,
       },
-    });
+    }).count();
 
     const stats = {
       uniqueVisits: coach.profileViews?.uniqueVisits ?? 0,
