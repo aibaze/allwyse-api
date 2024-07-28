@@ -285,8 +285,8 @@ const getCoachStats = async (req, res) => {
             completionPercentage,
             totalSeats: service.totalSeats,
             seatsLeft: service.seatsLeft,
-            uniqueVisits: service.profileViews?.uniqueVisits,
-            totalVisits: service.profileViews?.totalVisits,
+            uniqueVisits: service.profileViews?.uniqueVisits || 0,
+            totalVisits: service.profileViews?.totalVisits || 0,
           },
         ],
         combinedUniqueVisits:
