@@ -264,7 +264,7 @@ const getCoachStats = async (req, res) => {
       ]);
 
     let servicesStats = {
-      services: [],
+      byServices: [],
       uniqueVisits: 0,
       totalVisits: 0,
     };
@@ -277,7 +277,7 @@ const getCoachStats = async (req, res) => {
       );
       servicesStats = {
         byServices: [
-          ...servicesStats.services,
+          ...servicesStats.byServices,
           {
             serviceId: service._id,
             title: service.title,
