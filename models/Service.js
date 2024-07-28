@@ -58,6 +58,9 @@ const ServiceSchema = mongoose.Schema(
     seatsLeft: {
       type: Number /* ? */,
     },
+    totalSeats: {
+      type: Number /* ? */,
+    },
     coachId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Coach",
