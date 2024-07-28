@@ -6,6 +6,8 @@ const { Student } = require("../../../models/Student");
 const { MailtrapClient } = require("mailtrap");
 const cookie = require("cookie");
 const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
+const { getPercentage } = require("../../../utils/format");
+const { getStartAndEndOfCurrentMonth } = require("../../../utils/date");
 
 function slugify(name) {
   return name
@@ -268,12 +270,21 @@ const getCoachStats = async (req, res) => {
     };
 
     services.forEach((service) => {
+      const bookedSeats = service.totalSeats - service.seatsLeft;
+      const completionPercentage = getPercentage(
+        service.totalSeats,
+        bookedSeats
+      );
       servicesStats = {
         byServices: [
           ...servicesStats.services,
           {
             serviceId: service._id,
             title: service.title,
+            bookedSeats,
+            completionPercentage,
+            totalSeats: service.totalSeats,
+            seatsLeft: service.seatsLeft,
             uniqueVisits: service.profileViews?.uniqueVisits,
             totalVisits: service.profileViews?.totalVisits,
           },
@@ -285,6 +296,15 @@ const getCoachStats = async (req, res) => {
       };
     });
 
+    const { startOfMonth, endOfMonth } = getStartAndEndOfCurrentMonth();
+
+    const clientsCreatedThisMonth = await Student.find({
+      createdAt: {
+        $gte: startOfMonth,
+        $lte: endOfMonth,
+      },
+    });
+
     const stats = {
       uniqueVisits: coach.profileViews?.uniqueVisits ?? 0,
       totalVisits: coach.profileViews?.totalVisits ?? 0,
@@ -293,6 +313,7 @@ const getCoachStats = async (req, res) => {
       clients: clients.length,
       totalAmountOfAppointmentsToDate: historicEvents,
       servicesStats,
+      clientsCreatedThisMonth,
     };
     res.status(200).json({ ...stats });
   } catch (error) {
