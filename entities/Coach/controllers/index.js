@@ -285,14 +285,14 @@ const getCoachStats = async (req, res) => {
             completionPercentage,
             totalSeats: service.totalSeats,
             seatsLeft: service.seatsLeft,
-            uniqueVisits: service.profileViews?.uniqueVisits || 0,
-            totalVisits: service.profileViews?.totalVisits || 0,
+            uniqueVisits: service.views?.uniqueVisits || 0,
+            totalVisits: service.views?.totalVisits || 0,
           },
         ],
         combinedUniqueVisits:
-          servicesStats.uniqueVisits + service.profileViews?.uniqueVisits ?? 0,
+          servicesStats.uniqueVisits + service.views?.uniqueVisits ?? 0,
         combinedTotalVisits:
-          servicesStats.totalVisits + service.profileViews?.totalVisits ?? 0,
+          servicesStats.totalVisits + service.views?.totalVisits ?? 0,
       };
     });
 
@@ -303,6 +303,7 @@ const getCoachStats = async (req, res) => {
         $gte: startOfMonth,
         $lte: endOfMonth,
       },
+      coachId: new ObjectId(req.params.coachId),
     }).count();
 
     const stats = {
