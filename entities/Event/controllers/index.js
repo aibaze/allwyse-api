@@ -21,7 +21,7 @@ const createEvent = async (req, res) => {
   const email = req.loggedUser.email || req.loggedUser;
 
   try {
-    if (email.includes("soytomasgoldenberg")) {
+    if (email.includes("bymelinaviera")) {
       console.log("Creating google event for coach");
       const {
         attendees,
