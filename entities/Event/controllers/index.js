@@ -13,7 +13,7 @@ const auth2Client = new google.auth.OAuth2(
 );
 const calendar = google.calendar({
   version: "v3",
-  auth: process.env.CALENDAR_API_KEY,
+  auth: auth2Client, //process.env.CALENDAR_API_KEY,
 });
 
 const createEvent = async (req, res) => {
