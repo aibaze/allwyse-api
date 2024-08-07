@@ -81,6 +81,8 @@ const createEvent = async (req, res) => {
     });
     res.status(201).json({ event });
   } catch (error) {
+    console.log(error);
+    console.log(error.response?.data);
     if (googleError) {
       await GoogleInfo.deleteOne({ coachId: new ObjectId(req.body.coachId) });
     }
