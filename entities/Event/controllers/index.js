@@ -11,34 +11,9 @@ const auth2Client = new google.auth.OAuth2(
   process.env.CALENDAR_CLIENT_SECRET,
   "postmessage"
 );
-auth2Client.setCredentials({ refresh_token: googleInfo?.token });
 const calendar = google.calendar({
   version: "v3",
   auth: auth2Client, //process.env.CALENDAR_API_KEY,
-});
-
-await calendar.events.insert({
-  calendarId: "primary",
-  auth: auth2Client,
-  conferenceDataVersion: 1,
-  requestBody: {
-    summary: title,
-    description: description,
-    start: {
-      dateTime: dayjs(start),
-      timeZone: userTimeZone,
-    },
-    end: {
-      dateTime: dayjs(end),
-      timeZone: userTimeZone,
-    },
-    conferenceData: {
-      createRequest: {
-        requestId: uuid(),
-      },
-    },
-    attendees: attendees,
-  },
 });
 
 const createEvent = async (req, res) => {
