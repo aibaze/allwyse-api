@@ -83,8 +83,8 @@ const createEvent = async (req, res) => {
   } catch (error) {
     console.log(error);
     console.log(error.response?.data);
-    console.log(error.response?.data.errors);
-    console.log(error.response?.data.details);
+    console.log(error.response?.data.error.errors);
+    console.log(error.response?.data.error.details);
     if (googleError) {
       await GoogleInfo.deleteOne({ coachId: new ObjectId(req.body.coachId) });
     }
