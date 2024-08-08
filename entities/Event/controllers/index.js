@@ -13,7 +13,7 @@ const auth2Client = new google.auth.OAuth2(
 );
 const calendar = google.calendar({
   version: "v3",
-  auth: auth2Client, //process.env.CALENDAR_API_KEY,
+  auth: process.env.CALENDAR_API_KEY,
 });
 
 const createEvent = async (req, res) => {
@@ -35,7 +35,7 @@ const createEvent = async (req, res) => {
       const googleInfo = await GoogleInfo.findOne({
         coachId: new ObjectId(coachId),
       });
-
+      console.log(googleInfo, "google info");
       auth2Client.setCredentials({ refresh_token: googleInfo?.token });
 
       await calendar.events.insert({
