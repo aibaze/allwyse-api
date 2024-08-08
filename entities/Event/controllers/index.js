@@ -37,7 +37,10 @@ const createEvent = async (req, res) => {
       });
       console.log(googleInfo, "google info");
 
-      auth2Client.setCredentials({ refresh_token: googleInfo?.token });
+      auth2Client.setCredentials({
+        refresh_token: googleInfo?.token,
+        access_token: googleInfo?.access_token,
+      });
       // Get information about the new access token
       const tokenInfo = await auth2Client.getTokenInfo(
         newToken.credentials.access_token
@@ -121,6 +124,7 @@ const googleAuth = async (req, res) => {
     const body = {
       token: tokens.refresh_token,
       expiresIn: tokens.expiry_date,
+      access_token: tokens.access_token,
       coachId: req.body.coachId,
     };
     console.log(tokens);
