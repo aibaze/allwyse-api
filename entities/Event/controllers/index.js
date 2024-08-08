@@ -40,9 +40,7 @@ const createEvent = async (req, res) => {
       auth2Client.setCredentials({ refresh_token: googleInfo?.token });
       const newToken = await auth2Client.refreshAccessToken();
       auth2Client.setCredentials(newToken.credentials);
-      const tokenInfo = await auth2Client.getTokenInfo(
-        auth2Client.credentials.access_token
-      );
+      const tokenInfo = await auth2Client.getTokenInfo(newToken.credentials);
       console.log("Current Scopes:", tokenInfo.scope);
       await calendar.events.insert({
         calendarId: "primary",
