@@ -43,7 +43,7 @@ const createEvent = async (req, res) => {
       });
       // Get information about the new access token
       const tokenInfo = await auth2Client.getTokenInfo(
-        newToken.credentials.access_token
+        auth2Client.credentials.access_token
       );
       console.log("Token Info:", tokenInfo);
       await calendar.events.insert({
