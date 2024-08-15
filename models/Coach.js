@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const { StudentSchema } = require("./Student");
-const { CategorySchema } = require("./Category");
+const { ExperienceSchema } = require("./Experience");
 const { SocialLinkSchema } = require("./SocialLink");
 
 const CoachSchema = mongoose.Schema(
@@ -66,6 +66,13 @@ const CoachSchema = mongoose.Schema(
       interestedIn: {
         type: [String],
       },
+      onBoarded: {
+        type: Boolean,
+      },
+      experience: {
+        type: [ExperienceSchema],
+        default: [],
+      },
       description: {
         type: String,
       },
@@ -104,6 +111,13 @@ const CoachSchema = mongoose.Schema(
     },
     interestedIn: {
       type: [String],
+    },
+    onBoarded: {
+      type: Boolean,
+    },
+    experience: {
+      type: [ExperienceSchema],
+      default: [],
     },
   },
   {
