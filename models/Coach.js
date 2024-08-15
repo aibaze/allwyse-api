@@ -54,9 +54,17 @@ const CoachSchema = mongoose.Schema(
       location: {
         type: String,
       },
-      categories: {
-        type: [CategorySchema],
-        default: [],
+      category: {
+        type: String,
+      },
+      speciality: {
+        type: String,
+      },
+      yof: {
+        type: Number,
+      },
+      interestedIn: {
+        type: [String],
       },
       description: {
         type: String,
@@ -83,6 +91,19 @@ const CoachSchema = mongoose.Schema(
         type: Number,
         default: 0,
       },
+    },
+
+    category: {
+      type: String,
+    },
+    speciality: {
+      type: String,
+    },
+    yof: {
+      type: Number,
+    },
+    interestedIn: {
+      type: [String],
     },
   },
   {
