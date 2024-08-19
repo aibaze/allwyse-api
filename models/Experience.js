@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const ExperienceSchema = mongoose.Schema({
-  _id: {
+  id: {
     type: String,
   },
   area: {
