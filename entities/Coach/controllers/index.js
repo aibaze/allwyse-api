@@ -85,7 +85,7 @@ const updateCoach = async (req, res) => {
     let updatedBody = {};
 
     if (payload.category) {
-      updatedBody["profileInfo.category"] = payload.categories;
+      updatedBody["profileInfo.category"] = payload.category;
     }
     if (payload.speciality) {
       updatedBody["profileInfo.speciality"] = payload.speciality;
