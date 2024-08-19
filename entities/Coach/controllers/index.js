@@ -96,8 +96,8 @@ const updateCoach = async (req, res) => {
     if (payload.interestedIn) {
       updatedBody["profileInfo.interestedIn"] = payload.interestedIn;
     }
-    if (payload.onBoarded) {
-      updatedBody["yof"] = payload.onBoarded;
+    if (payload.experience) {
+      updatedBody["profileInfo.experience"] = payload.experience;
     }
 
     if (payload.languages) {
