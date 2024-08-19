@@ -66,9 +66,7 @@ const CoachSchema = mongoose.Schema(
       interestedIn: {
         type: [String],
       },
-      onBoarded: {
-        type: Boolean,
-      },
+
       experience: {
         type: [ExperienceSchema],
         default: [],
