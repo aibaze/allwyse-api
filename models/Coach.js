@@ -99,25 +99,8 @@ const CoachSchema = mongoose.Schema(
         default: 0,
       },
     },
-
-    category: {
-      type: String,
-    },
-    speciality: {
-      type: String,
-    },
-    yof: {
-      type: Number,
-    },
-    interestedIn: {
-      type: [String],
-    },
     onBoarded: {
       type: Boolean,
-    },
-    experience: {
-      type: [ExperienceSchema],
-      default: [],
     },
   },
   {
