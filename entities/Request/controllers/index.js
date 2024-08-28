@@ -88,7 +88,11 @@ const getCoachRequests = async (req, res) => {
         : {
             type: req.query.type?.toUpperCase(),
             state: {
-              $in: [SEEN_REQUEST_STATUSES.NEW, SEEN_REQUEST_STATUSES.READ],
+              $in: [
+                SEEN_REQUEST_STATUSES.NEW,
+                SEEN_REQUEST_STATUSES.READ,
+                SEEN_REQUEST_STATUSES.ANSWERED,
+              ],
             },
           };
     const matchObj = req.query.type
