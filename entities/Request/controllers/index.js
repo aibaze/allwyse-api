@@ -16,6 +16,31 @@ const createRequest = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+const deleteRequest = async (req, res) => {
+  try {
+    const user = req.loggedUser;
+    const request = await Request.findOne({
+      _id: new ObjectId(req.params.requestId),
+    });
+
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    if (request.coachId.toString() !== user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to delete this request" });
+    }
+
+    await Request.deleteOne({
+      _id: new ObjectId(req.params.requestId),
+    });
+    res.status(200).json({ message: "Deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 const answerRequest = async (req, res) => {
   try {
@@ -36,20 +61,20 @@ const answerRequest = async (req, res) => {
       html: `${req.body.message} <br/> <p>To keep chating with ${coach.firstName} ${coach.lastName} in its plaform, create a free account here</p>`,
     });
 
-    // Update request status to accepted
+    // Update request status to ANSWERED
     await Request.updateOne(
       {
         _id: new ObjectId(req.params.requestId),
       },
-      { state: REQUEST_STATUSES.ACCEPTED, answer: req.body.message }
+      { state: REQUEST_STATUSES.ANSWERED, answer: req.body.message }
     );
 
     const updatedRequest = await Request.findOne({
       _id: new ObjectId(req.params.requestId),
     });
 
-    res.status(201).json({
-      request: { ...updatedRequest, state: REQUEST_STATUSES.ACCEPTED },
+    res.status(200).json({
+      request: { ...updatedRequest, state: REQUEST_STATUSES.ANSWERED },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -193,4 +218,5 @@ module.exports = {
   getRequestById,
   updateRequestById,
   answerRequest,
+  deleteRequest,
 };
