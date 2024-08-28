@@ -18,7 +18,9 @@ const createRequest = async (req, res) => {
 };
 const deleteRequest = async (req, res) => {
   try {
-    const user = req.loggedUser;
+    const email = req.loggedUser.email || req.loggedUser;
+    const coach = await Coach.findOne({ email });
+
     const request = await Request.findOne({
       _id: new ObjectId(req.params.requestId),
     });
@@ -27,7 +29,7 @@ const deleteRequest = async (req, res) => {
       return res.status(404).json({ message: "Request not found" });
     }
 
-    if (request.coachId.toString() !== user._id.toString()) {
+    if (coach?._id?.toString() !== user._id.toString()) {
       return res
         .status(403)
         .json({ message: "You are not allowed to delete this request" });
