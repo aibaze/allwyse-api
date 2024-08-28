@@ -29,7 +29,7 @@ const deleteRequest = async (req, res) => {
       return res.status(404).json({ message: "Request not found" });
     }
 
-    if (coach?._id?.toString() !== user._id.toString()) {
+    if (coach?._id?.toString() !== request?.coachId.toString()) {
       return res
         .status(403)
         .json({ message: "You are not allowed to delete this request" });
