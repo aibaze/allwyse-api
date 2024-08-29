@@ -9,6 +9,9 @@ const RequestSchema = mongoose.Schema(
     serviceId: {
       type: mongoose.Schema.Types.ObjectId,
     },
+    serviceTitle: {
+      type: String,
+    },
     subject: {
       type: String,
     },

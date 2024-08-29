@@ -10,6 +10,16 @@ const Coach = require("../../../models/Coach");
 
 const createRequest = async (req, res) => {
   try {
+    let payload = req.body;
+    if (payload.serviceId) {
+      const service = await Service.findOne({
+        _id: new ObjectId(payload.serviceId),
+      });
+      payload = {
+        ...payload,
+        serviceTitle: service.title,
+      };
+    }
     const request = await Request.create(req.body);
     res.status(201).json({ request });
   } catch (error) {
