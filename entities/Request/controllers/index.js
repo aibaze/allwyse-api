@@ -96,7 +96,7 @@ const answerRequest = async (req, res) => {
 const getCoachRequests = async (req, res) => {
   try {
     let query = {
-      type: req.query.type?.toUpperCase(),
+      type: req.query.type?.toUpperCase() || "SERVICE",
       state: {
         $in: [
           SEEN_REQUEST_STATUSES.NEW,
@@ -110,24 +110,18 @@ const getCoachRequests = async (req, res) => {
       query = {
         ...query,
         $or: [
-          { subject: { $regex: req.query.search, $options: "i" } },
           { email: { $regex: req.query.search, $options: "i" } },
-          { answer: { $regex: req.query.search, $options: "i" } },
           { name: { $regex: req.query.search, $options: "i" } },
-          { lastName: { $regex: req.query.search, $options: "i" } },
+          { answer: { $regex: req.query.search, $options: "i" } },
           { message: { $regex: req.query.search, $options: "i" } },
         ],
       };
     }
 
-    const matchObj = req.query.type
-      ? {
-          coachId: new ObjectId(req.params.coachId),
-          ...query,
-        }
-      : {
-          coachId: new ObjectId(req.params.coachId),
-        };
+    const matchObj = {
+      coachId: new ObjectId(req.params.coachId),
+      ...query,
+    };
 
     const requests = await Request.find(matchObj);
     res.status(201).json({ requests });
