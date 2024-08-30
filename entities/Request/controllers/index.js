@@ -95,19 +95,31 @@ const answerRequest = async (req, res) => {
 };
 const getCoachRequests = async (req, res) => {
   try {
-    const query =
-      req.query.type === "accepted"
-        ? { state: REQUEST_STATUSES.ACCEPTED }
-        : {
-            type: req.query.type?.toUpperCase(),
-            state: {
-              $in: [
-                SEEN_REQUEST_STATUSES.NEW,
-                SEEN_REQUEST_STATUSES.READ,
-                SEEN_REQUEST_STATUSES.ANSWERED,
-              ],
-            },
-          };
+    let query = {
+      type: req.query.type?.toUpperCase(),
+      state: {
+        $in: [
+          SEEN_REQUEST_STATUSES.NEW,
+          SEEN_REQUEST_STATUSES.READ,
+          SEEN_REQUEST_STATUSES.ANSWERED,
+        ],
+      },
+    };
+
+    if (req.query.search) {
+      query = {
+        ...query,
+        $or: [
+          { subject: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+          { answer: { $regex: req.query.search, $options: "i" } },
+          { name: { $regex: req.query.search, $options: "i" } },
+          { lastName: { $regex: req.query.search, $options: "i" } },
+          { message: { $regex: req.query.search, $options: "i" } },
+        ],
+      };
+    }
+
     const matchObj = req.query.type
       ? {
           coachId: new ObjectId(req.params.coachId),
