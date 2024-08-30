@@ -21,7 +21,7 @@ const createRequest = async (req, res) => {
         serviceTitle: service.title,
       };
     }
-    const request = await Request.create(req.body);
+    const request = await Request.create(payload);
     res.status(201).json({ request });
   } catch (error) {
     res.status(500).json({ message: error.message });
