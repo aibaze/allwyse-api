@@ -7,6 +7,7 @@ const {
 } = require("../../../constants");
 const { MailtrapClient } = require("mailtrap");
 const Coach = require("../../../models/Coach");
+const Service = require("../../../models/Service");
 
 const createRequest = async (req, res) => {
   try {
