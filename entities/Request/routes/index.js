@@ -8,6 +8,7 @@ const {
   answerRequest,
   deleteRequest,
   clientAnswerCreatingNewRequest,
+  confirmRequest,
 } = require("../controllers");
 const requestRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
@@ -19,6 +20,7 @@ requestRouter.post("/client-answer/:requestId", clientAnswerCreatingNewRequest);
 
 // PRIVATE ROUTES
 requestRouter.put("/update/:requestId", authMiddleware, updateRequestById);
+requestRouter.put("/confirm/:requestId", authMiddleware, confirmRequest);
 requestRouter.get("/coach/:coachId", authMiddleware, getCoachRequests);
 requestRouter.get("/:requestId", authMiddleware, getRequestById);
 requestRouter.delete("/:requestId", authMiddleware, deleteRequest);
