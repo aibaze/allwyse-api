@@ -149,11 +149,7 @@ const getCoachRequests = async (req, res) => {
     let query = {
       type: req.query.type?.toUpperCase() || "SERVICE",
       state: {
-        $in: [
-          SEEN_REQUEST_STATUSES.NEW,
-          SEEN_REQUEST_STATUSES.READ,
-          SEEN_REQUEST_STATUSES.ANSWERED,
-        ],
+        $in: [SEEN_REQUEST_STATUSES.NEW, SEEN_REQUEST_STATUSES.ANSWERED],
       },
     };
 
@@ -285,6 +281,23 @@ const updateRequestById = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+const confirmRequest = async (req, res) => {
+  try {
+    await Request.updateOne(
+      {
+        _id: new ObjectId(req.params.requestId),
+      },
+      { state: REQUEST_STATUSES.ACCEPTED }
+    );
+
+    // create events
+
+    res.status(201).json({ message: "Request accepted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 module.exports = {
   createRequest,
   getCoachRequests,
@@ -294,4 +307,5 @@ module.exports = {
   answerRequest,
   deleteRequest,
   clientAnswerCreatingNewRequest,
+  confirmRequest,
 };
