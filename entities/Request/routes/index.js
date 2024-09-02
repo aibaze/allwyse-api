@@ -7,6 +7,7 @@ const {
   updateRequestById,
   answerRequest,
   deleteRequest,
+  clientAnswerCreatingNewRequest,
 } = require("../controllers");
 const requestRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
@@ -14,6 +15,9 @@ const authMiddleware = require("../../../middlewares/AuthMiddleware");
 // PUBLIC ROUTES
 requestRouter.post("/", createRequest);
 requestRouter.post("/answer/:requestId", answerRequest);
+requestRouter.post("/client-answer/:requestId", clientAnswerCreatingNewRequest);
+
+// PRIVATE ROUTES
 requestRouter.put("/update/:requestId", authMiddleware, updateRequestById);
 requestRouter.get("/coach/:coachId", authMiddleware, getCoachRequests);
 requestRouter.get("/:requestId", authMiddleware, getRequestById);
