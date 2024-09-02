@@ -55,6 +55,53 @@ const deleteRequest = async (req, res) => {
   }
 };
 
+const clientAnswerCreatingNewRequest = async (req, res) => {
+  try {
+    const previousRequest = await Request.findOne({
+      _id: new ObjectId(req.body.requestId),
+    });
+
+    if (!previousRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    const coach = await Coach.findOne({
+      _id: new ObjectId(previousRequest.coachId),
+    });
+
+    const newRequest = {
+      coachId: previousRequest.coachId,
+      serviceId: previousRequest.serviceId,
+      serviceTitle: previousRequest.serviceTitle,
+      email: previousRequest.email,
+      name: previousRequest.name,
+      type: previousRequest.type,
+      priority: previousRequest.priority,
+      message: req.body.message,
+      state: REQUEST_STATUSES.NEW,
+      isStarred: false,
+      requestedDate: previousRequest.requestedDate,
+      requestedTime: previousRequest.requestedTime,
+    };
+    await Request.create(newRequest);
+
+    // Send email
+    const TOKEN = process.env.EMAIL_API_KEY;
+    const client = new MailtrapClient({ token: TOKEN });
+    await client.send({
+      from: { email: "info@allwyse.io" },
+      to: [{ email: coach.email }],
+      subject: `Hello ${coach.firstName} ${coach.lastName}, ${previousRequest.name} answered your message  !`,
+      html: `${req.body.message} <br/> <p>To answer ${previousRequest.name} question, click  <a href="www.allwyse.io/requests" />here</a></p>`,
+    });
+
+    res.status(200).json({
+      request: newRequest,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 const answerRequest = async (req, res) => {
   try {
     const request = await Request.findOne({
@@ -67,11 +114,15 @@ const answerRequest = async (req, res) => {
     // Send email
     const TOKEN = process.env.EMAIL_API_KEY;
     const client = new MailtrapClient({ token: TOKEN });
+    const clientAnswerUrl = `www.allwyse.io/info/${coach.slug}/services/${
+      request.serviceId
+    }?fromRequestId=${request._id.toString()}`;
+
     await client.send({
       from: { email: "info@allwyse.io" },
       to: [{ email: request.email }],
       subject: `Hello ${request.name},Here is the answer of your request for ${coach.firstName} ${coach.lastName}  !`,
-      html: `${req.body.message} <br/> <p>To keep chating with ${coach.firstName} ${coach.lastName} in its plaform, create a free account here</p>`,
+      html: `${req.body.message} <br/> <p>To keep chating with ${coach.firstName} ${coach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a></p>`,
     });
 
     // Update request status to ANSWERED
@@ -242,4 +293,5 @@ module.exports = {
   updateRequestById,
   answerRequest,
   deleteRequest,
+  clientAnswerCreatingNewRequest,
 };

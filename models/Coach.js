@@ -97,6 +97,20 @@ const CoachSchema = mongoose.Schema(
         default: 0,
       },
     },
+    subscriptionInfo: {
+      cutoff: {
+        type: String,
+      },
+      type: {
+        type: String,
+      },
+      startDate: {
+        type: String,
+      },
+      paymentMethod: {
+        type: String,
+      },
+    },
     onBoarded: {
       type: Boolean,
     },
