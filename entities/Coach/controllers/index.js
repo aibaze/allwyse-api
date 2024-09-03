@@ -107,7 +107,7 @@ const updateCoach = async (req, res) => {
       const currentCoach = await Coach.findOne({ _id: coachId }).lean();
 
       const sender = {
-        email: "mailtrap@allwyse.io",
+        email: "melina@allwyse.io",
         name: "Allwyse team",
       };
       const recipients = [
