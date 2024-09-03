@@ -102,6 +102,26 @@ const updateCoach = async (req, res) => {
 
     if (payload.onBoarded) {
       updatedBody["onBoarded"] = payload.onBoarded;
+      const TOKEN = process.env.EMAIL_API_KEY;
+      const client = new MailtrapClient({ token: TOKEN });
+
+      const sender = {
+        email: "info.allwyse@gmail.com",
+        name: "Allwyse team",
+      };
+      const recipients = [
+        {
+          email: coach.email,
+        },
+      ];
+      client.send({
+        from: sender,
+        to: recipients,
+        template_uuid: "875494a3-ff2c-4a0f-ac88-4929bab9f2e1",
+        template_variables: {
+          name: `${coach.firstName} ${coach.lastName}`,
+        },
+      });
     }
 
     if (payload.languages) {
