@@ -104,6 +104,7 @@ const updateCoach = async (req, res) => {
       updatedBody["onBoarded"] = payload.onBoarded;
       const TOKEN = process.env.EMAIL_API_KEY;
       const client = new MailtrapClient({ token: TOKEN });
+      const currentCoach = await Coach.findOne({ _id: coachId }).lean();
 
       const sender = {
         email: "info.allwyse@gmail.com",
@@ -111,7 +112,7 @@ const updateCoach = async (req, res) => {
       };
       const recipients = [
         {
-          email: coach.email,
+          email: currentCoach.email,
         },
       ];
       client.send({
@@ -119,7 +120,7 @@ const updateCoach = async (req, res) => {
         to: recipients,
         template_uuid: "875494a3-ff2c-4a0f-ac88-4929bab9f2e1",
         template_variables: {
-          name: `${coach.firstName} ${coach.lastName}`,
+          name: `${currentCoach.firstName} ${currentCoach.lastName}`,
         },
       });
     }
