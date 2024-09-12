@@ -288,7 +288,7 @@ const updateRequestById = async (req, res) => {
 
 const confirmRequest = async (req, res) => {
   try {
-    const currentRequestReq = Request.findOne({
+    const currentRequest = await Request.findOne({
       _id: new ObjectId(req.params.requestId),
     });
     const currentServiceReq = Service.findOne({
@@ -298,8 +298,7 @@ const confirmRequest = async (req, res) => {
       _id: new ObjectId(currentRequest.coachId),
     });
 
-    const [currentRequest, currentService, currentCoach] = await Promise.all([
-      currentRequestReq,
+    const [currentService, currentCoach] = await Promise.all([
       currentServiceReq,
       currentCoachReq,
     ]);
