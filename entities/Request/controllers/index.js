@@ -309,7 +309,10 @@ const confirmRequest = async (req, res) => {
     );
 
     //create client
-    let client = await Student.findOne({ email: currentRequest.email });
+    let client = await Student.findOne({
+      email: currentRequest.email,
+      coachId: currentRequest.coachId,
+    });
 
     if (!client) {
       await Student.create({
