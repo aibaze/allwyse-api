@@ -368,12 +368,19 @@ const confirmRequest = async (req, res) => {
       }
     }
 
-    console.log("event", event);
     await Student.updateOne(
       { _id: new ObjectId(client._id) },
       {
         $set: {
           appointments: [...client.appointments, event._id],
+        },
+      }
+    );
+    await Coach.updateOne(
+      { _id: new ObjectId(currentRequest.coachId) },
+      {
+        $push: {
+          students: event._id,
         },
       }
     );

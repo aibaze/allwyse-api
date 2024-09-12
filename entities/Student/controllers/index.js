@@ -77,7 +77,7 @@ const getStudentsByCoach = async (req, res) => {
     let students = [];
 
     if (!req.query.detailed) {
-      students = await Student.find(matchObj)
+      students = await Student.find(matchObj);
     } else {
       students = await Student.aggregate([
         { $match: matchObj },
