@@ -378,7 +378,11 @@ const confirmRequest = async (req, res) => {
     // Send email
     const TOKEN = process.env.EMAIL_API_KEY;
     const emailClient = new MailtrapClient({ token: TOKEN });
-
+    const clientAnswerUrl = `www.allwyse.io/info/${
+      currentCoach.slug
+    }/services/${
+      currentRequest.serviceId
+    }?fromRequestId=${currentRequest._id.toString()}`;
     await emailClient.send({
       from: { email: "info@allwyse.io" },
       to: [{ email: currentRequest.email }],
