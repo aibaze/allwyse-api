@@ -288,16 +288,21 @@ const updateRequestById = async (req, res) => {
 
 const confirmRequest = async (req, res) => {
   try {
-    const currentRequest = await Request.findOne({
+    const currentRequestReq = Request.findOne({
       _id: new ObjectId(req.params.requestId),
     });
-    const currentService = await Service.findOne({
+    const currentServiceReq = Service.findOne({
       _id: new ObjectId(currentRequest.serviceId),
     });
-    const currentCoach = await Coach.findOne({
+    const currentCoachReq = Coach.findOne({
       _id: new ObjectId(currentRequest.coachId),
     });
 
+    const [currentRequest, currentService, currentCoach] = await Promise.all([
+      currentRequestReq,
+      currentServiceReq,
+      currentCoachReq,
+    ]);
     if (!currentRequest) {
       return res.status(404).json({ message: "Request not found" });
     }
