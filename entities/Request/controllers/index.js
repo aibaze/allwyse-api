@@ -386,9 +386,7 @@ const confirmRequest = async (req, res) => {
       html: `${req.body.message} <br/> <p>To keep chating with ${currentCoach.firstName} ${currentCoach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p>`,
     });
 
-    res
-      .status(201)
-      .json({ message: "Request accepted", client: student, event });
+    res.status(201).json({ message: "Request accepted", client, event });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
