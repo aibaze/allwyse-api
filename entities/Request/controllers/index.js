@@ -326,7 +326,7 @@ const confirmRequest = async (req, res) => {
     }
 
     // create events in progress
-    let events = [];
+    let event = [];
     // Remove "hs" and format the time
     const requestedTime = currentRequest.requestedTime.replace(" hs", ":00");
 
@@ -336,7 +336,7 @@ const confirmRequest = async (req, res) => {
       .set("minute", requestedTime.split(":")[1]);
 
     if (currentService.sessionPeriodicity === "one-time") {
-      events = await createEventMethod({
+      event = await createEventMethod({
         attendees: [
           {
             email: currentRequest.email,
@@ -365,17 +365,26 @@ const confirmRequest = async (req, res) => {
       }
     }
 
+    console.log("event", event);
     await Student.updateOne(
       { _id: new ObjectId(client._id) },
       {
         $set: {
-          appointments: [
-            ...client.appointments,
-            ...events.map((event) => event._id),
-          ],
+          appointments: [...client.appointments, event._id],
         },
       }
     );
+
+    // Send email
+    const TOKEN = process.env.EMAIL_API_KEY;
+    const emailClient = new MailtrapClient({ token: TOKEN });
+
+    await emailClient.send({
+      from: { email: "info@allwyse.io" },
+      to: [{ email: currentRequest.email }],
+      subject: `Hello ${request.name},Here is the answer of your request for ${coach.firstName} ${coach.lastName}  ! <br/> <p> Your appointment is confirmed</p>`,
+      html: `${req.body.message} <br/> <p>To keep chating with ${coach.firstName} ${coach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p>`,
+    });
 
     res
       .status(201)
