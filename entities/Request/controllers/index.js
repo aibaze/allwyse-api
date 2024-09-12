@@ -1,13 +1,17 @@
 const { Request } = require("../../../models/Request");
 const { ObjectId } = require("mongodb");
+const dayjs = require("dayjs");
 const {
   REQUEST_STATUSES,
   REQUEST_TYPES,
   SEEN_REQUEST_STATUSES,
 } = require("../../../constants");
+const { createEventMethod } = require("../../Event/controllers");
 const { MailtrapClient } = require("mailtrap");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
+const { Student } = require("../../../models/Student");
+const cli = require("nodemon/lib/cli");
 
 const createRequest = async (req, res) => {
   try {
@@ -284,6 +288,19 @@ const updateRequestById = async (req, res) => {
 
 const confirmRequest = async (req, res) => {
   try {
+    const currentRequest = await Request.findOne({
+      _id: new ObjectId(req.params.requestId),
+    });
+    const currentService = await Service.findOne({
+      _id: new ObjectId(currentRequest.serviceId),
+    });
+    const currentCoach = await Coach.findOne({
+      _id: new ObjectId(currentRequest.coachId),
+    });
+
+    if (!currentRequest) {
+      return res.status(404).json({ message: "Request not found" });
+    }
     await Request.updateOne(
       {
         _id: new ObjectId(req.params.requestId),
@@ -291,9 +308,75 @@ const confirmRequest = async (req, res) => {
       { state: REQUEST_STATUSES.ACCEPTED }
     );
 
-    // create events
+    //create client
+    let client = await Student.findOne({ email: currentRequest.email });
 
-    res.status(201).json({ message: "Request accepted" });
+    if (!client) {
+      await Student.create({
+        email: currentRequest.email,
+        firstName: currentRequest.name,
+        coachId: currentRequest.coachId,
+        services: [currentRequest.serviceId],
+        appointments: [],
+      });
+      client = await Student.findOne({ email: currentRequest.email });
+    }
+
+    // create events in progress
+    let events = [];
+    // Remove "hs" and format the time
+    const requestedTime = currentRequest.requestedTime.replace(" hs", ":00");
+
+    // Parse the date and add the time to it using Day.js
+    let startDate = dayjs(currentRequest.requestedDate)
+      .set("hour", requestedTime.split(":")[0])
+      .set("minute", requestedTime.split(":")[1]);
+
+    if (currentService.sessionPeriodicity === "one-time") {
+      events = await createEventMethod({
+        attendees: [
+          {
+            email: currentRequest.email,
+          },
+          {
+            email: currentCoach.email,
+          },
+        ],
+        coachId: currentRequest.coachId,
+        color: "#8E33FF",
+        description: `${currentService.title} : ${currentCoach.firstName} / ${currentRequest.name}`,
+        start: startDate.valueOf(),
+        end: startDate.valueOf() + currentService.sessionDuration * 60 * 1000,
+        startDate: startDate.toISOString(),
+        sendEmail: true,
+        serviceId: currentRequest.serviceId,
+        sessionDuration: currentService.sessionDuration,
+        studentEmail: currentRequest.email,
+        studentId: client._id,
+        studentName: currentRequest.name,
+        title: currentService.title,
+        userTimeZone: "America/Buenos_Aires",
+      });
+      if (events.error) {
+        res.status(500).json({ message: events.error });
+      }
+    }
+
+    await Student.updateOne(
+      { _id: new ObjectId(client._id) },
+      {
+        $set: {
+          appointments: [
+            ...client.appointments,
+            ...events.map((event) => event._id),
+          ],
+        },
+      }
+    );
+
+    res
+      .status(201)
+      .json({ message: "Request accepted", client: student, events });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
