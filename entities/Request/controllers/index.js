@@ -305,7 +305,7 @@ const confirmRequest = async (req, res) => {
       {
         _id: new ObjectId(req.params.requestId),
       },
-      { state: REQUEST_STATUSES.ACCEPTED }
+      { state: REQUEST_STATUSES.ACCEPTED, answer: req.body.message }
     );
 
     //create client
@@ -382,13 +382,13 @@ const confirmRequest = async (req, res) => {
     await emailClient.send({
       from: { email: "info@allwyse.io" },
       to: [{ email: currentRequest.email }],
-      subject: `Hello ${request.name},Here is the answer of your request for ${coach.firstName} ${coach.lastName}  ! <br/> <p> Your appointment is confirmed</p>`,
-      html: `${req.body.message} <br/> <p>To keep chating with ${coach.firstName} ${coach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p>`,
+      subject: `Hello ${currentRequest.name},Here is the answer of your request for ${currentCoach.firstName} ${currentCoach.lastName}  ! <br/> <p> Your appointment is confirmed</p>`,
+      html: `${req.body.message} <br/> <p>To keep chating with ${currentCoach.firstName} ${currentCoach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p>`,
     });
 
     res
       .status(201)
-      .json({ message: "Request accepted", client: student, events });
+      .json({ message: "Request accepted", client: student, event });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
