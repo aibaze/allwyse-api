@@ -322,7 +322,10 @@ const confirmRequest = async (req, res) => {
         services: [currentRequest.serviceId],
         appointments: [],
       });
-      client = await Student.findOne({ email: currentRequest.email });
+      client = await Student.findOne({
+        email: currentRequest.email,
+        coachId: currentRequest.coachId,
+      });
     }
 
     // create events in progress
