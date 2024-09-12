@@ -16,87 +16,81 @@ const calendar = google.calendar({
   auth: process.env.CALENDAR_API_KEY,
 });
 
-const createEvent = async (req, res) => {
-  let googleError = false; //true;
-  const email = req.loggedUser.email || req.loggedUser;
+const createEventMethod = async (body) => {
+  let googleError = true;
 
   try {
-    if (email.includes("bymelinaviera")) {
-      console.log("Creating google event for coach");
-      const {
-        attendees,
-        userTimeZone,
-        start,
-        end,
-        title,
-        description,
-        coachId,
-      } = req.body;
-      const googleInfo = await GoogleInfo.findOne({
-        coachId: new ObjectId(coachId),
-      });
-      console.log(googleInfo, "google info");
+    const { attendees, userTimeZone, start, end, title, description, coachId } =
+      body;
+    const googleInfo = await GoogleInfo.findOne({
+      coachId: new ObjectId(coachId),
+    });
+    console.log(googleInfo, "google info");
 
-      auth2Client.setCredentials({
-        refresh_token: googleInfo?.token,
-        access_token: googleInfo?.access_token,
-      });
-      // Get information about the new access token
-      const tokenInfo = await auth2Client.getTokenInfo(
-        auth2Client.credentials.access_token
-      );
-      console.log("Token Info:", tokenInfo);
-      await calendar.events.insert({
-        calendarId: "primary",
-        auth: auth2Client,
-        conferenceDataVersion: 1,
-        requestBody: {
-          summary: title,
-          description: description,
-          start: {
-            dateTime: dayjs(start),
-            timeZone: userTimeZone,
-          },
-          end: {
-            dateTime: dayjs(end),
-            timeZone: userTimeZone,
-          },
-          conferenceData: {
-            createRequest: {
-              requestId: uuid(),
-            },
-          },
-          attendees: attendees,
+    auth2Client.setCredentials({
+      refresh_token: googleInfo?.token,
+      access_token: googleInfo?.access_token,
+    });
+    // Get information about the new access token
+    const tokenInfo = await auth2Client.getTokenInfo(
+      auth2Client.credentials.access_token
+    );
+    console.log("Token Info:", tokenInfo);
+    await calendar.events.insert({
+      calendarId: "primary",
+      auth: auth2Client,
+      conferenceDataVersion: 1,
+      requestBody: {
+        summary: title,
+        description: description,
+        start: {
+          dateTime: dayjs(start),
+          timeZone: userTimeZone,
         },
-      });
-    }
+        end: {
+          dateTime: dayjs(end),
+          timeZone: userTimeZone,
+        },
+        conferenceData: {
+          createRequest: {
+            requestId: uuid(),
+          },
+        },
+        attendees: attendees,
+      },
+    });
 
     googleError = false;
     let studentId = "";
     try {
       const student = await Student.findOne({
-        email: req.body.studentEmail,
-        coachId: new ObjectId(req.body.coachId),
+        email: body.studentEmail,
+        coachId: new ObjectId(body.coachId),
       });
       studentId = student._id;
     } catch (error) {}
     const event = await Event.create({
-      ...req.body,
+      ...body,
       studentId: studentId,
-      startDate: req.body.startDate || new Date(req.body.start),
+      startDate: body.startDate || new Date(body.start),
       createdAt: new Date(),
-      title: `${req.body.studentName} (${req.body.description})`,
+      title: `${body.studentName} (${body.description})`,
     });
-    res.status(201).json({ event });
+    return event;
   } catch (error) {
-    console.log(error);
-    console.log(error.response?.data);
-    console.log(error.response?.data.error.errors);
-    console.log(error.response?.data.error.details);
     if (googleError) {
       await GoogleInfo.deleteOne({ coachId: new ObjectId(req.body.coachId) });
     }
-    res.status(500).json({ message: error.message });
+    return { error: error.message };
+  }
+};
+
+const createEvent = async (req, res) => {
+  const event = createEventMethod(req.body);
+  if (event.error) {
+    res.status(500).json({ message: event.error });
+  } else {
+    res.status(201).json({ event });
   }
 };
 
@@ -159,4 +153,5 @@ module.exports = {
   checkIfItsAuth,
   googleAuth,
   getPublicEventsByCoach,
+  createEventMethod,
 };
