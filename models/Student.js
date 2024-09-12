@@ -8,15 +8,14 @@ const StudentSchema = mongoose.Schema(
     },
     lastName: {
       type: String,
-      required: [true, "Last name is required"],
     },
     email: {
       type: String,
       required: [true, "Email  is required"],
     },
     coachId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Coach",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Coach",
     },
     services: [
       {
@@ -46,10 +45,10 @@ const StudentSchema = mongoose.Schema(
       type: String,
     },
     sessions: {
-        type: Number,
+      type: Number,
     },
     state: {
-        type: String,
+      type: String,
     },
   },
   {
@@ -57,6 +56,6 @@ const StudentSchema = mongoose.Schema(
   }
 );
 
-const Student = mongoose.model("Student", StudentSchema,"student")
+const Student = mongoose.model("Student", StudentSchema, "student");
 
-module.exports = {StudentSchema,Student}
+module.exports = { StudentSchema, Student };
