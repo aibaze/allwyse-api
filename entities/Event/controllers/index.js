@@ -79,7 +79,7 @@ const createEventMethod = async (body) => {
     return event;
   } catch (error) {
     if (googleError) {
-      await GoogleInfo.deleteOne({ coachId: new ObjectId(req.body.coachId) });
+      await GoogleInfo.deleteOne({ coachId: new ObjectId(body.coachId) });
     }
     return { error: error.message };
   }
