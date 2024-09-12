@@ -360,7 +360,7 @@ const confirmRequest = async (req, res) => {
         title: currentService.title,
         userTimeZone: "America/Buenos_Aires",
       });
-      if (events.error) {
+      if (event.error) {
         res.status(500).json({ message: events.error });
       }
     }
