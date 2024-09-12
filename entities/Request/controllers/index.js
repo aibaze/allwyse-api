@@ -396,8 +396,10 @@ const confirmRequest = async (req, res) => {
     await emailClient.send({
       from: { email: "info@allwyse.io" },
       to: [{ email: currentRequest.email }],
-      subject: `Hello ${currentRequest.name},Here is the answer of your request for ${currentCoach.firstName} ${currentCoach.lastName}  ! <br/> <p> Your appointment is confirmed</p>`,
-      html: `${req.body.message} <br/> <p>To keep chating with ${currentCoach.firstName} ${currentCoach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p>`,
+      subject: `Hello ${currentRequest.name},Here is the answer of your request for ${currentCoach.firstName} ${currentCoach.lastName}  ! `,
+      html: `${req.body.message} <br/> 
+      <p>Your appointment is confirmed </p>
+      <br/> <p>To keep chating with ${currentCoach.firstName} ${currentCoach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p> `,
     });
 
     res.status(201).json({ message: "Request accepted", client, event });
