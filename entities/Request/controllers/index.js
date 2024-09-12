@@ -364,7 +364,7 @@ const confirmRequest = async (req, res) => {
         userTimeZone: "America/Buenos_Aires",
       });
       if (event.error) {
-        res.status(500).json({ message: events.error });
+        res.status(500).json({ message: event.error });
       }
     }
 
@@ -380,7 +380,7 @@ const confirmRequest = async (req, res) => {
       { _id: new ObjectId(currentRequest.coachId) },
       {
         $push: {
-          students: event._id,
+          students: client._id,
         },
       }
     );
