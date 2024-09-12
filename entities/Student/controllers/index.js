@@ -88,8 +88,18 @@ const getStudentsByCoach = async (req, res) => {
     if (!coach) {
       throw new Error("Coach not found");
     }
+    let matchObj = { _id: { $in: coach.students } };
 
-    const matchObj = { _id: { $in: coach.students } };
+    if (req.query.search) {
+      matchObj = {
+        ...matchObj,
+        $or: [
+          { email: { $regex: req.query.search, $options: "i" } },
+          { firstName: { $regex: req.query.search, $options: "i" } },
+          { lastName: { $regex: req.query.search, $options: "i" } },
+        ],
+      };
+    }
     let students = [];
 
     if (!req.query.detailed) {
