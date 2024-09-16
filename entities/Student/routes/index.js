@@ -11,7 +11,11 @@ const studentRouter = express.Router();
 // PUBLIC ROUTES
 studentRouter.post("/", authMiddleware, createStudent);
 studentRouter.get("/coach/:coachId", authMiddleware, getStudentsByCoach);
-studentRouter.put("/:studentId/coach/:coachId", authMiddleware, updateStudent);
+studentRouter.put(
+  "/update/:studentId/coach/:coachId",
+  authMiddleware,
+  updateStudent
+);
 studentRouter.delete(
   "/coach/:coachId/student/:studentId",
   authMiddleware,
