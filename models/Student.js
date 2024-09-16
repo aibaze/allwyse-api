@@ -50,6 +50,18 @@ const StudentSchema = mongoose.Schema(
     state: {
       type: String,
     },
+    country: {
+      type: String,
+    },
+    fullName: {
+      type: String,
+    },
+    noteAbout: {
+      type: String,
+    },
+    phoneNumber: {
+      type: String,
+    },
   },
   {
     timestamps: true,
