@@ -6,6 +6,33 @@ const { Event } = require("../../../models/Event");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
 
+const updateStudent = async (req, res) => {
+  try {
+    const student = await Student.findOne({
+      _id: new ObjectId(req.params.studentId),
+    });
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    await Student.updateOne(
+      { _id: new ObjectId(req.params.studentId) },
+      {
+        $set: {
+          ...req.body,
+        },
+      }
+    );
+    const updatedStudent = await Student.findOne({
+      _id: new ObjectId(req.params.studentId),
+    });
+    res.status(200).json({ student: updatedStudent });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const deleteStudent = async (req, res) => {
   try {
     const student = await Student.findOne({
@@ -136,4 +163,5 @@ module.exports = {
   createStudent,
   getStudentsByCoach,
   deleteStudent,
+  updateStudent,
 };
