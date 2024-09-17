@@ -124,6 +124,7 @@ const getStudentsByCoach = async (req, res) => {
           { email: { $regex: req.query.search, $options: "i" } },
           { firstName: { $regex: req.query.search, $options: "i" } },
           { lastName: { $regex: req.query.search, $options: "i" } },
+          { fullName: { $regex: req.query.search, $options: "i" } },
         ],
       };
     }
