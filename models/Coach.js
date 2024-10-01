@@ -39,6 +39,9 @@ const CoachSchema = mongoose.Schema(
       professionalImg: {
         type: String,
       },
+      education: {
+        type: String,
+      },
       socialLinks: {
         type: [SocialLinkSchema],
       },
@@ -59,6 +62,15 @@ const CoachSchema = mongoose.Schema(
       },
       speciality: {
         type: String,
+      },
+      brandName: {
+        type: String,
+      },
+      brandRole: {
+        type: String,
+      },
+      shouldShowBrand: {
+        type: Boolean,
       },
       yof: {
         type: Number,

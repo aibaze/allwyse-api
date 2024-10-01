@@ -4,7 +4,7 @@ const ExperienceSchema = mongoose.Schema({
   id: {
     type: String,
   },
-  area: {
+  expertise: {
     type: String,
   },
   brand: {

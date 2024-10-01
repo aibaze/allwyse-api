@@ -132,6 +132,21 @@ const updateCoach = async (req, res) => {
     if (payload.location) {
       updatedBody["profileInfo.location"] = payload.location;
     }
+    if (payload.socialLinks) {
+      updatedBody["profileInfo.socialLinks"] = payload.socialLinks;
+    }
+    if (payload.brandName) {
+      updatedBody["profileInfo.brandName"] = payload.brandName;
+    }
+    if (payload.brandRole) {
+      updatedBody["profileInfo.brandRole"] = payload.brandRole;
+    }
+    if (payload.shouldShowBrand) {
+      updatedBody["profileInfo.shouldShowBrand"] = payload.shouldShowBrand;
+    }
+    if (payload.education) {
+      updatedBody["profileInfo.education"] = payload.education;
+    }
 
     if (payload.shortDescription) {
       updatedBody["profileInfo.shortDescription"] = payload.shortDescription;

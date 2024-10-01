@@ -1,14 +1,12 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
-const SocialLinkSchema = mongoose.Schema(
-    {
-        url:{
-            type: String,
-        },
-        label:{
-            type: String,
-        },
-    }
-)
+const SocialLinkSchema = mongoose.Schema({
+  url: {
+    type: String,
+  },
+  label: {
+    type: String,
+  },
+});
 
-module.exports = {SocialLinkSchema}
+module.exports = { SocialLinkSchema };
