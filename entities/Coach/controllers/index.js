@@ -65,13 +65,29 @@ const handleGoogleSSO = async (authorizationHeader) => {
   };
 };
 
+const checkSSOToken = async (req, res) => {
+  try {
+    const authorizationHeader = req.body.x_auth_token_sso;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: authorizationHeader,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    res.status(200).json({ email: payload.email });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const createCoach = async (req, res) => {
   let reqBody = req.body;
   try {
     if (reqBody.SSO === "GOOGLE") {
-      const authorizationHeader = req.header("x_auth_token")
-        ? req.header("x_auth_token")
-        : req.cookies.x_auth_token;
+      const authorizationHeader = req.header("x_auth_token_sso")
+        ? req.header("x_auth_token_sso")
+        : req.cookies.x_auth_token_sso;
       reqBody = await handleGoogleSSO(authorizationHeader);
     }
     const existingCoach = await Coach.findOne({ email: reqBody.email });
@@ -413,4 +429,5 @@ module.exports = {
   getCoachBySlug,
   logNewView,
   getCoachStats,
+  checkSSOToken,
 };
