@@ -99,6 +99,9 @@ const CoachSchema = mongoose.Schema(
     lastLogin: {
       type: String,
     },
+    SSO: {
+      type: String,
+    },
     profileViews: {
       uniqueVisits: {
         type: Number,

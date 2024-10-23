@@ -8,6 +8,9 @@ const cookie = require("cookie");
 const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
 const { getPercentage } = require("../../../utils/format");
 const { getStartAndEndOfCurrentMonth } = require("../../../utils/date");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client();
 
 function slugify(name) {
   return name
@@ -44,22 +47,47 @@ const createSlug = (firstName, lastName) => {
   return slug;
 };
 
+const handleGoogleSSO = async (authorizationHeader) => {
+  const ticket = await googleClient.verifyIdToken({
+    idToken: authorizationHeader,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  return {
+    email: payload.email,
+    firstName: payload.given_name,
+    lastName: payload.family_name,
+    SSO: "GOOGLE",
+    profileInfo: {
+      profileImg: payload.picture,
+    },
+  };
+};
+
 const createCoach = async (req, res) => {
+  let reqBody = req.body;
   try {
-    const existingCoach = await Coach.findOne({ email: req.body.email });
+    if (reqBody.SSO === "GOOGLE") {
+      const authorizationHeader = req.header("x_auth_token")
+        ? req.header("x_auth_token")
+        : req.cookies.x_auth_token;
+      reqBody = await handleGoogleSSO(authorizationHeader);
+    }
+    const existingCoach = await Coach.findOne({ email: reqBody.email });
     if (existingCoach) {
       throw new Error(
-        `Another account with ${req.body.email} email has already been taken`
+        `Another account with ${reqBody.email} email has already been taken`
       );
     }
 
-    let slug = createSlug(req.body.firstName, req.body.lastName);
+    let slug = createSlug(reqBody.firstName, reqBody.lastName);
     const existingSlug = await Coach.findOne({ slug });
     if (existingSlug) {
       slug = await handleUniqueSlug(slug);
     }
     const body = {
-      ...req.body,
+      ...reqBody,
       slug,
     };
     const coach = await Coach.create(body);
