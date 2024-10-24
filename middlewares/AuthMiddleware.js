@@ -1,5 +1,9 @@
 const jsonwebtoken = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client();
+
 const jsonWebKeysDev = {
   keys: [
     {
@@ -75,32 +79,53 @@ const authMiddleware = (req, res, next) => {
   const authorizationHeader = req.header("x_auth_token")
     ? req.header("x_auth_token")
     : req.cookies.x_auth_token;
+  const ssoAuthorizationHeader = req.header("x_auth_token_sso")
+    ? req.header("x_auth_token_sso")
+    : req.cookies.x_auth_token_sso;
 
-  const startsWith = authorizationHeader.startsWith("Bearer ");
-  if (!authorizationHeader || !startsWith) {
+  if (
+    !authorizationHeader?.replace("Bearer ", "")?.trim() &&
+    !ssoAuthorizationHeader
+  ) {
     return res
       .status(401)
       .json({ error: true, message: "Invalid authorization header" });
   }
+  if (ssoAuthorizationHeader) {
+    googleClient
+      .verifyIdToken({
+        idToken: ssoAuthorizationHeader,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      })
+      .then((ticket) => {
+        const payload = ticket.getPayload();
+        req.loggedUser = payload.email;
+        next();
+      })
+      .catch((err) => {
+        console.log(err);
+        return res.status(401).json({ error: true, message: "Invalid token" });
+      });
+  } else if (authorizationHeader) {
+    const token = authorizationHeader.replace("Bearer ", "");
 
-  const token = authorizationHeader.replace("Bearer ", "");
-
-  if (!token) {
-    return res
-      .status(401)
-      .json({ error: true, message: "Authorization token not found" });
-  }
-  const header = decodeTokenHeader(token);
-
-  const jsonWebKey = getJsonWebKeyWithKID(header.kid);
-
-  verifyJsonWebTokenSignature(token, jsonWebKey, (err, decodedToken) => {
-    if (err?.expiredAt) {
-      return res.status(401).json({ error: true, message: "Invalid token" });
-    } else {
-      req.loggedUser = decodedToken.email;
-      next();
+    if (!token) {
+      return res
+        .status(401)
+        .json({ error: true, message: "Authorization token not found" });
     }
-  });
+    const header = decodeTokenHeader(token);
+
+    const jsonWebKey = getJsonWebKeyWithKID(header.kid);
+
+    verifyJsonWebTokenSignature(token, jsonWebKey, (err, decodedToken) => {
+      if (err?.expiredAt) {
+        return res.status(401).json({ error: true, message: "Invalid token" });
+      } else {
+        req.loggedUser = decodedToken.email;
+        next();
+      }
+    });
+  }
 };
 module.exports = authMiddleware;

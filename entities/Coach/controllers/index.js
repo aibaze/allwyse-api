@@ -8,6 +8,9 @@ const cookie = require("cookie");
 const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
 const { getPercentage } = require("../../../utils/format");
 const { getStartAndEndOfCurrentMonth } = require("../../../utils/date");
+const { OAuth2Client } = require("google-auth-library");
+
+const googleClient = new OAuth2Client();
 
 function slugify(name) {
   return name
@@ -44,22 +47,63 @@ const createSlug = (firstName, lastName) => {
   return slug;
 };
 
-const createCoach = async (req, res) => {
+const handleGoogleSSO = async (authorizationHeader) => {
+  const ticket = await googleClient.verifyIdToken({
+    idToken: authorizationHeader,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+  return {
+    email: payload.email,
+    firstName: payload.given_name,
+    lastName: payload.family_name,
+    SSO: "GOOGLE",
+    profileInfo: {
+      profileImg: payload.picture,
+    },
+  };
+};
+
+const checkSSOToken = async (req, res) => {
   try {
-    const existingCoach = await Coach.findOne({ email: req.body.email });
+    const authorizationHeader = req.body.x_auth_token_sso;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: authorizationHeader,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    res.status(200).json({ email: payload.email });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const createCoach = async (req, res) => {
+  let reqBody = req.body;
+  try {
+    if (reqBody.SSO === "GOOGLE") {
+      const authorizationHeader = req.header("x_auth_token_sso")
+        ? req.header("x_auth_token_sso")
+        : req.cookies.x_auth_token_sso;
+      reqBody = await handleGoogleSSO(authorizationHeader);
+    }
+    const existingCoach = await Coach.findOne({ email: reqBody.email });
     if (existingCoach) {
       throw new Error(
-        `Another account with ${req.body.email} email has already been taken`
+        `Another account with ${reqBody.email} email has already been taken`
       );
     }
 
-    let slug = createSlug(req.body.firstName, req.body.lastName);
+    let slug = createSlug(reqBody.firstName, reqBody.lastName);
     const existingSlug = await Coach.findOne({ slug });
     if (existingSlug) {
       slug = await handleUniqueSlug(slug);
     }
     const body = {
-      ...req.body,
+      ...reqBody,
       slug,
     };
     const coach = await Coach.create(body);
@@ -185,7 +229,6 @@ const getCoach = async (req, res) => {
       ? { email: req.params.id }
       : { _id: new ObjectId(req.params.id) };
     const coach = await Coach.findOne(query).lean();
-    const authorizationHeader = req.header("x_auth_token");
 
     if (req.query.isLogin) {
       Coach.updateOne(query, {
@@ -193,16 +236,20 @@ const getCoach = async (req, res) => {
       });
     }
 
-    let minute = 60 * 1000;
-    res.setHeader(
-      "Set-Cookie",
-      cookie.serialize("x_auth_token", authorizationHeader, {
-        httpOnly: true,
-        maxAge: minute * 60,
-        path: "/",
-        sameSite: "none",
-      })
-    );
+    if (!coach.SSO) {
+      const authorizationHeader = req.header("x_auth_token");
+      let minute = 60 * 1000;
+      res.setHeader(
+        "Set-Cookie",
+        cookie.serialize("x_auth_token", authorizationHeader, {
+          httpOnly: true,
+          maxAge: minute * 60,
+          path: "/",
+          sameSite: "none",
+        })
+      );
+    }
+
     res.status(200).json({ ...coach });
   } catch (error) {
     console.log(error.message);
@@ -385,4 +432,5 @@ module.exports = {
   getCoachBySlug,
   logNewView,
   getCoachStats,
+  checkSSOToken,
 };
