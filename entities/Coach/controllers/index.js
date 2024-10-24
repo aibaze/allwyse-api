@@ -229,7 +229,6 @@ const getCoach = async (req, res) => {
       ? { email: req.params.id }
       : { _id: new ObjectId(req.params.id) };
     const coach = await Coach.findOne(query).lean();
-    const authorizationHeader = req.header("x_auth_token");
 
     if (req.query.isLogin) {
       Coach.updateOne(query, {
@@ -237,16 +236,20 @@ const getCoach = async (req, res) => {
       });
     }
 
-    let minute = 60 * 1000;
-    res.setHeader(
-      "Set-Cookie",
-      cookie.serialize("x_auth_token", authorizationHeader, {
-        httpOnly: true,
-        maxAge: minute * 60,
-        path: "/",
-        sameSite: "none",
-      })
-    );
+    if (!coach.SSO) {
+      const authorizationHeader = req.header("x_auth_token");
+      let minute = 60 * 1000;
+      res.setHeader(
+        "Set-Cookie",
+        cookie.serialize("x_auth_token", authorizationHeader, {
+          httpOnly: true,
+          maxAge: minute * 60,
+          path: "/",
+          sameSite: "none",
+        })
+      );
+    }
+
     res.status(200).json({ ...coach });
   } catch (error) {
     console.log(error.message);

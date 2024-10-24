@@ -83,16 +83,18 @@ const authMiddleware = (req, res, next) => {
     ? req.header("x_auth_token_sso")
     : req.cookies.x_auth_token_sso;
 
-  if (!authorizationHeader && !ssoAuthorizationHeader) {
+  if (
+    !authorizationHeader?.replace("Bearer ", "")?.trim() &&
+    !ssoAuthorizationHeader
+  ) {
     return res
       .status(401)
       .json({ error: true, message: "Invalid authorization header" });
   }
-
   if (ssoAuthorizationHeader) {
     googleClient
       .verifyIdToken({
-        idToken: authorizationHeader,
+        idToken: ssoAuthorizationHeader,
         audience: process.env.GOOGLE_CLIENT_ID,
       })
       .then((ticket) => {
@@ -100,7 +102,8 @@ const authMiddleware = (req, res, next) => {
         req.loggedUser = payload.email;
         next();
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         return res.status(401).json({ error: true, message: "Invalid token" });
       });
   } else if (authorizationHeader) {
