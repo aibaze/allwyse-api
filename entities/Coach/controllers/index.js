@@ -236,19 +236,18 @@ const getCoach = async (req, res) => {
       });
     }
 
-    if (!coach.SSO) {
-      const authorizationHeader = req.header("x_auth_token");
-      let minute = 60 * 1000;
-      res.setHeader(
-        "Set-Cookie",
-        cookie.serialize("x_auth_token", authorizationHeader, {
-          httpOnly: true,
-          maxAge: minute * 60,
-          path: "/",
-          sameSite: "none",
-        })
-      );
-    }
+    const cookieName = !coach.SSO ? "x_auth_token" : "x_auth_token_sso";
+    const authorizationHeader = req.header(cookieName);
+    let minute = 60 * 1000;
+    res.setHeader(
+      "Set-Cookie",
+      cookie.serialize(cookieName, authorizationHeader, {
+        httpOnly: true,
+        maxAge: minute * 60,
+        path: "/",
+        sameSite: "none",
+      })
+    );
 
     res.status(200).json({ ...coach });
   } catch (error) {
