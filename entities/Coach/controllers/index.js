@@ -74,6 +74,16 @@ const checkSSOToken = async (req, res) => {
     });
 
     const payload = ticket.getPayload();
+    let minute = 60 * 1000;
+    res.setHeader(
+      "Set-Cookie",
+      cookie.serialize("auth_token_sso", authorizationHeader, {
+        httpOnly: true,
+        maxAge: minute * 60,
+        path: "/",
+        sameSite: "none",
+      })
+    );
     res.status(200).json({ email: payload.email });
   } catch (error) {
     console.log(error.message);
