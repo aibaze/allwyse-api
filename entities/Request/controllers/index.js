@@ -330,6 +330,15 @@ const confirmRequest = async (req, res) => {
         email: currentRequest.email,
         coachId: currentRequest.coachId,
       });
+    } else {
+      await Student.updateOne(
+        { _id: new ObjectId(client._id) },
+        {
+          $push: {
+            services: currentRequest.serviceId,
+          },
+        }
+      );
     }
 
     // create events in progress
@@ -368,7 +377,7 @@ const confirmRequest = async (req, res) => {
         userTimeZone: "America/Buenos_Aires",
       });
       if (event.error) {
-        res.status(500).json({ message: event.error });
+        throw new Error(event.error);
       }
     }
 
@@ -385,6 +394,15 @@ const confirmRequest = async (req, res) => {
       {
         $push: {
           students: client._id,
+        },
+      }
+    );
+
+    await Service.updateOne(
+      { _id: new ObjectId(currentRequest.serviceId) },
+      {
+        $set: {
+          seatsLeft: currentService.seatsLeft - 1,
         },
       }
     );

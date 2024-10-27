@@ -114,14 +114,12 @@ const checkIfItsAuth = async (req, res) => {
 const googleAuth = async (req, res) => {
   try {
     const { tokens } = await auth2Client.getToken(req.body.code);
-    console.log(tokens);
     const body = {
       token: tokens.refresh_token,
       expiresIn: tokens.expiry_date,
       access_token: tokens.access_token,
       coachId: req.body.coachId,
     };
-    console.log(tokens);
     await GoogleInfo.deleteMany({ coachId: req.body.coachId });
     await GoogleInfo.create(body);
     res.json({ message: "ok", error: null });

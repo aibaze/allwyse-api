@@ -4,7 +4,6 @@ const {
   getServicesByCoachId,
   deleteService,
   updateService,
-  logNewView,
   getServiceStats,
   updateServiceReviews,
   getServiceById,
@@ -32,7 +31,6 @@ serviceRouter.get("/coach/:coachId", getServicesByCoachId);
 serviceRouter.put("/reviews/:serviceId", updateServiceReviews);
 serviceRouter.put("/views/:serviceId", updateServiceViews);
 
-serviceRouter.post("/visit", logNewView);
 serviceRouter.get("/stats/:coachId", getServiceStats);
 
 module.exports = { serviceRouter };

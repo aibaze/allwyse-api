@@ -15,7 +15,7 @@ const { requestRouter } = require("./entities/Request/routes");
 const { internalStatRouter } = require("./entities/InternalStats/routes");
 const { postRouter } = require("./entities/Post/routes");
 
-app.use(cors({ credentials: true, origin: true })); // to do = imrpove cors policy
+app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
 app.options("*", cors({ credentials: true, origin: true }));
 app.use(cookieParser());

@@ -288,33 +288,6 @@ const deleteCoach = async (req, res) => {
   }
 };
 
-const logNewView = async (req, res) => {
-  try {
-    const isFirstVisit = req.body.firstVisit;
-    const coachId = new ObjectId(req.body.coachId);
-    const currentCoach = await Coach.findOne({ _id: coachId });
-
-    const body = {
-      uniqueVisits: isFirstVisit
-        ? currentCoach.profileViews.uniqueVisits + 1
-        : currentCoach.profileViews.uniqueVisits,
-      totalVisits: currentCoach.profileViews.totalVisits + 1,
-    };
-
-    await Coach.updateOne(
-      { _id: coachId },
-      {
-        profileViews: body,
-      }
-    );
-
-    res.status(201).json({ message: "OK" });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: error.message });
-  }
-};
-
 // una tabla de conversiones : guardar cada vez que un usuario crea un appointment
 const getCoachStats = async (req, res) => {
   try {
@@ -426,13 +399,33 @@ const getCoachStats = async (req, res) => {
   }
 };
 
+const updateCoachViews = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await Coach.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $set: {
+          profileViews: req.body.profileViews,
+        },
+      }
+    );
+
+    res.status(200).json({ message: "OK" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   updateCoach,
   createCoach,
   getCoach,
   deleteCoach,
   getCoachBySlug,
-  logNewView,
   getCoachStats,
   checkSSOToken,
+  updateCoachViews,
 };
