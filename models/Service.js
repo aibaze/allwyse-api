@@ -22,7 +22,7 @@ const ServiceSchema = mongoose.Schema(
       type: [String],
     },
     sessionDuration: {
-      type: String /* ? */,
+      type: String,
     },
     customSessionMinutes: {
       type: Number,
@@ -31,35 +31,35 @@ const ServiceSchema = mongoose.Schema(
       type: String /* hourly | course | other */,
     },
     price: {
-      type: String /* ? */,
+      type: String,
     },
     salePrice: {
-      type: String /* ? */,
+      type: String,
     },
 
     hidePrice: {
-      type: Boolean /* ? */,
+      type: Boolean,
     },
     mainTopics: {
-      type: [String] /* ? */,
+      type: [String],
     },
     languages: {
-      type: [String] /* ? */,
+      type: [String],
     },
     tags: {
-      type: [String] /* ? */,
+      type: [String],
     },
     published: {
-      type: Boolean /* ? */,
+      type: Boolean,
     },
     discount: {
-      type: Boolean /* ? */,
+      type: Boolean,
     },
     seatsLeft: {
-      type: Number /* ? */,
+      type: Number,
     },
     totalSeats: {
-      type: Number /* ? */,
+      type: Number,
     },
     coachId: {
       type: mongoose.Schema.Types.ObjectId,

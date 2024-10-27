@@ -154,33 +154,6 @@ const getServicesByCoachId = async (req, res) => {
   }
 };
 
-const logNewView = async (req, res) => {
-  try {
-    const isFirstVisit = req.body.firstVisit;
-    const serviceId = new ObjectId(req.body.serviceId);
-    const currentService = await Service.findOne({ _id: serviceId });
-
-    const body = {
-      uniqueVisits: isFirstVisit
-        ? currentService.profileViews.uniqueVisits + 1
-        : currentService.profileViews.uniqueVisits,
-      totalVisits: currentService.profileViews.totalVisits + 1,
-    };
-
-    await Service.updateOne(
-      { _id: coachId },
-      {
-        profileViews: body,
-      }
-    );
-
-    res.status(201).json({ message: "OK" });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: error.message });
-  }
-};
-
 const getServiceStats = async (req, res) => {
   try {
     const coachId = new ObjectId(req.params.coachId);
@@ -208,7 +181,6 @@ module.exports = {
   getServicesByCoachId,
   deleteService,
   updateService,
-  logNewView,
   getServiceStats,
   getServiceById,
   updateServiceReviews,
