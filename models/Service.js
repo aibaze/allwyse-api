@@ -61,6 +61,21 @@ const ServiceSchema = mongoose.Schema(
     totalSeats: {
       type: Number,
     },
+    startDate: {
+      type: String,
+    },
+    endDate: {
+      type: String,
+    },
+    startTime: {
+      type: String,
+    },
+    endTime: {
+      type: String,
+    },
+    color: {
+      type: String,
+    },
     coachId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Coach",

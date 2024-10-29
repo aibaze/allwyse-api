@@ -311,15 +311,15 @@ const getCoachStats = async (req, res) => {
 
     const clientsReq = Student.find({ coachId });
     const historicEventsReq = Event.find({
-      coachId: req.params.coachId,
+      coachId: coachId,
       startDate: historicFiltes,
     }).count();
     const eventsReq = Event.find({
-      coachId: req.params.coachId,
+      coachId: coachId,
       startDate: dateWeekFilters,
     });
     const eventsLeftTodayReq = Event.find({
-      coachId: req.params.coachId,
+      coachId: coachId,
       startDate: dayFilters,
     });
 
@@ -376,7 +376,7 @@ const getCoachStats = async (req, res) => {
         $gte: startOfMonth,
         $lte: endOfMonth,
       },
-      coachId: new ObjectId(req.params.coachId),
+      coachId,
     }).count();
 
     const stats = {
