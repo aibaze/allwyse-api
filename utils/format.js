@@ -4,7 +4,7 @@ const getPercentage = (totalAmount, partialAmount) => {
   }
 
   const percentage = (partialAmount / totalAmount) * 100;
-  return percentage;
+  return Math.floor(percentage);
 };
 
 module.exports = { getPercentage };

@@ -322,6 +322,7 @@ const confirmRequest = async (req, res) => {
       await Student.create({
         email: currentRequest.email,
         firstName: currentRequest.name,
+        fullName: currentRequest.name,
         coachId: currentRequest.coachId,
         services: [currentRequest.serviceId],
         appointments: [],

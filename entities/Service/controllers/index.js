@@ -64,10 +64,20 @@ const updateService = async (req, res) => {
     if (coach?._id?.toString() !== service.coachId?.toString()) {
       return res.status(403).json({ message: "Forbidden" });
     }
+    let updatingPayload = req.body;
+
+    if (req.body.totalSeats) {
+      const addedSeats = req.body.totalSeats - service.totalSeats;
+      updatingPayload = {
+        ...req.body,
+        totalSeats: req.body.totalSeats,
+        seatsLeft: service.seatsLeft + addedSeats,
+      };
+    }
 
     const updatedService = await Service.updateOne(
       { _id: new ObjectId(serviceId) },
-      { $set: req.body }
+      { $set: updatingPayload }
     );
 
     res.status(200).json({ service: updatedService });
