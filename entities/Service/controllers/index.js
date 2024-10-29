@@ -8,7 +8,7 @@ const createService = async (req, res) => {
     const newService = await Service.create({
       ...req.body,
       coachId,
-      totalSeats: req.body.seatsLeft,
+      seatsLeft: req.body.totalSeats,
     });
 
     await Coach.updateOne(

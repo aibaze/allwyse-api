@@ -57,6 +57,7 @@ const ServiceSchema = mongoose.Schema(
     },
     seatsLeft: {
       type: Number,
+      default: 0,
     },
     totalSeats: {
       type: Number,
