@@ -20,7 +20,7 @@ app.use(express.json());
 app.options("*", cors({ credentials: true, origin: true }));
 app.use(cookieParser());
 
-const PORT = 4000;
+const PORT = 4001;
 const uri = process.env.DB_URI;
 
 //ROUTES

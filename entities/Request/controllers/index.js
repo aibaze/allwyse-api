@@ -10,8 +10,12 @@ const { createEventMethod } = require("../../Event/controllers");
 const { MailtrapClient } = require("mailtrap");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
-const { Student } = require("../../../models/Student");
-const cli = require("nodemon/lib/cli");
+const { sendEmail } = require("../../../utils/email");
+const {
+  getRequestInformation,
+  createClientFromRequest,
+  updateRequestStakeholdersInformation,
+} = require("./requestHepers");
 
 const createRequest = async (req, res) => {
   try {
@@ -288,23 +292,15 @@ const updateRequestById = async (req, res) => {
 
 const confirmRequest = async (req, res) => {
   try {
-    const currentRequest = await Request.findOne({
-      _id: new ObjectId(req.params.requestId),
-    });
-    const currentServiceReq = Service.findOne({
-      _id: new ObjectId(currentRequest.serviceId),
-    });
-    const currentCoachReq = Coach.findOne({
-      _id: new ObjectId(currentRequest.coachId),
-    });
+    const { currentRequest, currentService, currentCoach } =
+      await getRequestInformation(req.params.requestId);
 
-    const [currentService, currentCoach] = await Promise.all([
-      currentServiceReq,
-      currentCoachReq,
-    ]);
+    // Return 404 if request doesnt exist
     if (!currentRequest) {
       return res.status(404).json({ message: "Request not found" });
     }
+
+    // UPDATE REQUEST STATUS TO ACCEPTED
     await Request.updateOne(
       {
         _id: new ObjectId(req.params.requestId),
@@ -312,47 +308,21 @@ const confirmRequest = async (req, res) => {
       { state: REQUEST_STATUSES.ACCEPTED, answer: req.body.message }
     );
 
-    //create client
-    let client = await Student.findOne({
-      email: currentRequest.email,
-      coachId: currentRequest.coachId,
-    });
+    //CREATE CLIENT
+    const client = await createClientFromRequest(currentRequest);
 
-    if (!client) {
-      await Student.create({
-        email: currentRequest.email,
-        firstName: currentRequest.name,
-        fullName: currentRequest.name,
-        coachId: currentRequest.coachId,
-        services: [currentRequest.serviceId],
-        appointments: [],
-      });
-      client = await Student.findOne({
-        email: currentRequest.email,
-        coachId: currentRequest.coachId,
-      });
-    } else {
-      await Student.updateOne(
-        { _id: new ObjectId(client._id) },
-        {
-          $push: {
-            services: currentRequest.serviceId,
-          },
-        }
-      );
-    }
-
-    // create events in progress
-    let event = [];
-    // Remove "hs" and format the time
-    const requestedTime = currentRequest.requestedTime.replace(" hs", ":00");
-
-    // Parse the date and add the time to it using Day.js
-    let startDate = dayjs(currentRequest.requestedDate)
-      .set("hour", requestedTime.split(":")[0])
-      .set("minute", requestedTime.split(":")[1]);
+    // create event in progress
+    let event = {};
 
     if (currentService.sessionPeriodicity === "one-time") {
+      // Remove "hs" and format the time
+      const requestedTime = currentRequest.requestedTime.replace(" hs", ":00");
+
+      // Parse the date and add the time to it using Day.js
+      let startDate = dayjs(currentRequest.requestedDate)
+        .set("hour", requestedTime.split(":")[0])
+        .set("minute", requestedTime.split(":")[1]);
+
       event = await createEventMethod({
         attendees: [
           {
@@ -380,45 +350,24 @@ const confirmRequest = async (req, res) => {
       if (event.error) {
         throw new Error(event.error);
       }
+      //TO-DO : CHECK EVENT DATA TYPE FOR DIFFERENT PERIODICITIES
+      await updateRequestStakeholdersInformation({
+        client,
+        event,
+        currentRequest,
+        currentService,
+      });
     }
 
-    await Student.updateOne(
-      { _id: new ObjectId(client._id) },
-      {
-        $set: {
-          appointments: [...client.appointments, event._id],
-        },
-      }
-    );
-    await Coach.updateOne(
-      { _id: new ObjectId(currentRequest.coachId) },
-      {
-        $push: {
-          students: client._id,
-        },
-      }
-    );
-
-    await Service.updateOne(
-      { _id: new ObjectId(currentRequest.serviceId) },
-      {
-        $set: {
-          seatsLeft: currentService.seatsLeft - 1,
-        },
-      }
-    );
 
     // Send email
-    const TOKEN = process.env.EMAIL_API_KEY;
-    const emailClient = new MailtrapClient({ token: TOKEN });
     const clientAnswerUrl = `www.allwyse.io/info/${
       currentCoach.slug
     }/services/${
       currentRequest.serviceId
     }?fromRequestId=${currentRequest._id.toString()}`;
-    await emailClient.send({
-      from: { email: "info@allwyse.io" },
-      to: [{ email: currentRequest.email }],
+    await sendEmail({
+      to: currentRequest.email,
       subject: `Hello ${currentRequest.name},Here is the answer of your request for ${currentCoach.firstName} ${currentCoach.lastName}  ! `,
       html: `${req.body.message} <br/> 
       <p>Your appointment is confirmed </p>
