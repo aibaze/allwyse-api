@@ -6,7 +6,11 @@ const {
   REQUEST_TYPES,
   SEEN_REQUEST_STATUSES,
 } = require("../../../constants");
-const { createEventMethod } = require("../../Event/controllers");
+const { createSingleEventMethod } = require("../../Event/controllers");
+const {
+  createMultipleEventsMethod,
+  getShortWeekday,
+} = require("../../Event/eventHelpers");
 const { MailtrapClient } = require("mailtrap");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
@@ -312,18 +316,17 @@ const confirmRequest = async (req, res) => {
     const client = await createClientFromRequest(currentRequest);
 
     // create event in progress
-    let event = {};
+    let events = [];
+    // Remove "hs" and format the time
+    const requestedTime = currentRequest.requestedTime.replace(" hs", ":00");
+
+    // Parse the date and add the time to it using Day.js
+    let startDate = dayjs(currentRequest.requestedDate)
+      .set("hour", requestedTime.split(":")[0])
+      .set("minute", requestedTime.split(":")[1]);
 
     if (currentService.sessionPeriodicity === "one-time") {
-      // Remove "hs" and format the time
-      const requestedTime = currentRequest.requestedTime.replace(" hs", ":00");
-
-      // Parse the date and add the time to it using Day.js
-      let startDate = dayjs(currentRequest.requestedDate)
-        .set("hour", requestedTime.split(":")[0])
-        .set("minute", requestedTime.split(":")[1]);
-
-      event = await createEventMethod({
+      events = await createSingleEventMethod({
         attendees: [
           {
             email: currentRequest.email,
@@ -347,18 +350,52 @@ const confirmRequest = async (req, res) => {
         title: currentService.title,
         userTimeZone: "America/Buenos_Aires",
       });
-      if (event.error) {
-        throw new Error(event.error);
+      if (events.error) {
+        throw new Error(events.error);
       }
-      //TO-DO : CHECK EVENT DATA TYPE FOR DIFFERENT PERIODICITIES
-      await updateRequestStakeholdersInformation({
-        client,
-        event,
-        currentRequest,
-        currentService,
+    } else {
+      const recurrence = {
+        startDate: startDate,
+        frequency: currentService.sessionPeriodicity,
+        interval: 1,
+        daysOfWeek: [getShortWeekday(startDate)], // ["WE"]
+        endDate: currentService.endDate || "2026-01-01T00:00:00Z",
+        duration: currentService.sessionDuration * 60 * 1000,
+      };
+
+      events = await createMultipleEventsMethod({
+        recurrence,
+        attendees: [
+          {
+            email: currentRequest.email,
+          },
+          {
+            email: currentCoach.email,
+          },
+        ],
+        coachId: currentRequest.coachId,
+        color: "#8E33FF",
+        description: `${currentService.title} : ${currentCoach.firstName} / ${currentRequest.name}`,
+        start: startDate.valueOf(),
+        end: startDate.valueOf() + recurrence.duration,
+        startDate: startDate.toISOString(),
+        sendEmail: true,
+        serviceId: currentRequest.serviceId,
+        sessionDuration: currentService.sessionDuration,
+        studentEmail: currentRequest.email,
+        studentId: client._id,
+        studentName: currentRequest.name,
+        title: currentService.title,
+        userTimeZone: "America/Buenos_Aires",
       });
     }
 
+    await updateRequestStakeholdersInformation({
+      client,
+      events, // this should be an array of events for services that are not "one-time"
+      currentRequest,
+      currentService,
+    });
 
     // Send email
     const clientAnswerUrl = `www.allwyse.io/info/${
@@ -374,7 +411,7 @@ const confirmRequest = async (req, res) => {
       <br/> <p>To keep chating with ${currentCoach.firstName} ${currentCoach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p> `,
     });
 
-    res.status(201).json({ message: "Request accepted", client, event });
+    res.status(201).json({ message: "Request accepted", client, events });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

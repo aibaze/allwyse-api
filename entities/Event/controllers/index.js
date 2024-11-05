@@ -16,7 +16,7 @@ const calendar = google.calendar({
   auth: process.env.CALENDAR_API_KEY,
 });
 
-const createEventMethod = async (body) => {
+const createSingleEventMethod = async (body) => {
   let googleError = true;
 
   try {
@@ -86,7 +86,7 @@ const createEventMethod = async (body) => {
 };
 
 const createEvent = async (req, res) => {
-  const event = createEventMethod(req.body);
+  const event = createSingleEventMethod(req.body);
   if (event.error) {
     res.status(500).json({ message: event.error });
   } else {
@@ -151,5 +151,5 @@ module.exports = {
   checkIfItsAuth,
   googleAuth,
   getPublicEventsByCoach,
-  createEventMethod,
+  createSingleEventMethod,
 };
