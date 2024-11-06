@@ -50,6 +50,9 @@ const RequestSchema = mongoose.Schema(
     requestedTime: {
       type: String,
     },
+    timeZone: {
+      type: String,
+    },
   },
   {
     timestamps: true,

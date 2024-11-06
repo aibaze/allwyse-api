@@ -15,6 +15,7 @@ const { MailtrapClient } = require("mailtrap");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
 const { sendEmail } = require("../../../utils/email");
+const { getFirstDateOfNextYearISO } = require("../../../utils/date");
 const {
   getRequestInformation,
   createClientFromRequest,
@@ -348,7 +349,7 @@ const confirmRequest = async (req, res) => {
         studentId: client._id,
         studentName: currentRequest.name,
         title: currentService.title,
-        userTimeZone: "America/Buenos_Aires",
+        userTimeZone: currentRequest.timeZone || "America/Buenos_Aires",
       });
       if (events.error) {
         throw new Error(events.error);
@@ -358,8 +359,11 @@ const confirmRequest = async (req, res) => {
         startDate: startDate,
         frequency: currentService.sessionPeriodicity,
         interval: 1,
-        daysOfWeek: [getShortWeekday(startDate)], // ["WE"]
-        endDate: currentService.endDate || "2026-01-01T00:00:00Z",
+        daysOfWeek:
+          currentService.sessionPeriodicity === "weekly"
+            ? [getShortWeekday(startDate)]
+            : null,
+        endDate: currentService.endDate || getFirstDateOfNextYearISO(),
         duration: currentService.sessionDuration * 60 * 1000,
       };
 
@@ -386,13 +390,13 @@ const confirmRequest = async (req, res) => {
         studentId: client._id,
         studentName: currentRequest.name,
         title: currentService.title,
-        userTimeZone: "America/Buenos_Aires",
+        userTimeZone: currentRequest.timeZone || "America/Buenos_Aires",
       });
     }
 
     await updateRequestStakeholdersInformation({
       client,
-      events, // this should be an array of events for services that are not "one-time"
+      events,
       currentRequest,
       currentService,
     });
