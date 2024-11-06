@@ -45,8 +45,24 @@ const getStartAndEndOfCurrentMonth = () => {
   return { startOfMonth, endOfMonth };
 };
 
+function getFirstDateOfNextYearISO() {
+  const today = dayjs();
+  const currentYear = today.year();
+  const currentMonth = today.month(); // 0-indexed: 0 for January, 11 for December
+
+  // Determine the target year
+  const targetYear = currentMonth > 7 ? currentYear + 2 : currentYear + 1;
+
+  // Create a Day.js object for January 1st of the target year
+  const firstDateOfNextYear = dayjs(`${targetYear}-01-01`);
+
+  // Return the date as an ISO 8601 string
+  return firstDateOfNextYear.toISOString();
+}
+
 module.exports = {
   getCurrentWeek,
   getCurrentDayBounds,
   getStartAndEndOfCurrentMonth,
+  getFirstDateOfNextYearISO,
 };
