@@ -102,6 +102,9 @@ const CoachSchema = mongoose.Schema(
     SSO: {
       type: String,
     },
+    timeZone: {
+      type: String,
+    },
     profileViews: {
       uniqueVisits: {
         type: Number,

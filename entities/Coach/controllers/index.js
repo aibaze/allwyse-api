@@ -215,6 +215,10 @@ const updateCoach = async (req, res) => {
       updatedBody["profileInfo.professionalImg"] = payload.professionalImg;
     }
 
+    if (payload.timeZone) {
+      updatedBody["profileInfo.timeZone"] = payload.timeZone;
+    }
+
     await Coach.updateOne({ _id: coachId }, { $set: updatedBody });
     const coach = await Coach.findOne({ _id: coachId }).lean();
     res.status(201).json({ ...coach });

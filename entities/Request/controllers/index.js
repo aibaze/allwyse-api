@@ -349,7 +349,7 @@ const confirmRequest = async (req, res) => {
         studentId: client._id,
         studentName: currentRequest.name,
         title: currentService.title,
-        userTimeZone: currentRequest.timeZone || "America/Buenos_Aires",
+        userTimeZone: currentCoach.timeZone || "America/Buenos_Aires",
       });
       if (events.error) {
         throw new Error(events.error);
@@ -390,7 +390,7 @@ const confirmRequest = async (req, res) => {
         studentId: client._id,
         studentName: currentRequest.name,
         title: currentService.title,
-        userTimeZone: currentRequest.timeZone || "America/Buenos_Aires",
+        userTimeZone: currentCoach.timeZone || "America/Buenos_Aires",
       });
     }
 
