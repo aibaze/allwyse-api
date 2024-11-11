@@ -1,5 +1,6 @@
 const { Service } = require("../../../models/Service");
 const Coach = require("../../../models/Coach");
+const { isoDateToUTCisoDate } = require("../../../utils/date");
 const { ObjectId } = require("mongodb");
 
 const createService = async (req, res) => {
@@ -8,6 +9,8 @@ const createService = async (req, res) => {
     const newService = await Service.create({
       ...req.body,
       coachId,
+      startTime: isoDateToUTCisoDate(req.body.startTime),
+      endTime: isoDateToUTCisoDate(req.body.endTime),
       seatsLeft: req.body.totalSeats,
     });
 
@@ -72,6 +75,20 @@ const updateService = async (req, res) => {
         ...req.body,
         totalSeats: req.body.totalSeats,
         seatsLeft: service.seatsLeft + addedSeats,
+      };
+    }
+
+    if (req.body.startTime) {
+      updatingPayload = {
+        ...updatingPayload,
+        startTime: isoDateToUTCisoDate(req.body.startTime),
+      };
+    }
+
+    if (req.body.endTime) {
+      updatingPayload = {
+        ...updatingPayload,
+        endTime: isoDateToUTCisoDate(req.body.endTime),
       };
     }
 

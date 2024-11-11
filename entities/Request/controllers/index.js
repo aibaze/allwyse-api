@@ -15,6 +15,7 @@ const { MailtrapClient } = require("mailtrap");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
 const { sendEmail } = require("../../../utils/email");
+const { isoDateToUTCisoDate } = require("../../../utils/date");
 const { getFirstDateOfNextYearISO } = require("../../../utils/date");
 const {
   getRequestInformation,
@@ -31,6 +32,8 @@ const createRequest = async (req, res) => {
       });
       payload = {
         ...payload,
+        requestedDate: isoDateToUTCisoDate(payload.requestedDate),
+        requestedTime: isoDateToUTCisoDate(payload.requestedTime),
         serviceTitle: service.title,
       };
     }
@@ -318,10 +321,9 @@ const confirmRequest = async (req, res) => {
 
     // create event in progress
     let events = [];
-    // Remove "hs" and format the time
-    const requestedTime = currentRequest.requestedTime.replace(" hs", ":00");
 
-    // Parse the date and add the time to it using Day.js
+    // combine the requested time and the requested date
+    const requestedTime = dayjs(currentRequest.requestedTime).format("HH:mm");
     let startDate = dayjs(currentRequest.requestedDate)
       .set("hour", requestedTime.split(":")[0])
       .set("minute", requestedTime.split(":")[1]);
@@ -349,7 +351,7 @@ const confirmRequest = async (req, res) => {
         studentId: client._id,
         studentName: currentRequest.name,
         title: currentService.title,
-        userTimeZone: currentCoach.timeZone || "America/Buenos_Aires",
+        userTimeZone: currentCoach.timeZone || "America/New_York",
       });
       if (events.error) {
         throw new Error(events.error);
@@ -390,7 +392,7 @@ const confirmRequest = async (req, res) => {
         studentId: client._id,
         studentName: currentRequest.name,
         title: currentService.title,
-        userTimeZone: currentCoach.timeZone || "America/Buenos_Aires",
+        userTimeZone: currentCoach.timeZone || "America/New_York",
       });
     }
 
