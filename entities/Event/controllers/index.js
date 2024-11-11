@@ -129,12 +129,23 @@ const googleAuth = async (req, res) => {
 };
 
 const getPublicEventsByCoach = async (req, res) => {
-  const events = await Event.find({ coachId: req.params.coachId });
+  let query = { coachId: req.params.coachId };
+  if (req.query.startDate) {
+    query = {
+      ...query,
+      startDate: {
+        $gte: new Date(req.query.startDate),
+        $lt: new Date(req.query.endDate),
+      },
+    };
+  }
+  const events = await Event.find(query);
   const parsedEvents = events.map((event) => {
     return {
       title: "Busy",
       color: event.color,
       start: event.start,
+      startDate: event.startDate,
       end: event.end,
       sendEmail: event.sendEmail,
       _id: event._id,

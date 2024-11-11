@@ -1,4 +1,8 @@
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+
+dayjs.extend(utc);
+
 function getCurrentWeek() {
   const currentDate = new Date();
 
@@ -60,9 +64,16 @@ function getFirstDateOfNextYearISO() {
   return firstDateOfNextYear.toISOString();
 }
 
+const isoDateToUTCisoDate = (isoDate) => {
+  if (!isoDate) return null;
+  const utcDate = dayjs(isoDate).utc().toISOString();
+  return utcDate;
+};
+
 module.exports = {
   getCurrentWeek,
   getCurrentDayBounds,
   getStartAndEndOfCurrentMonth,
   getFirstDateOfNextYearISO,
+  isoDateToUTCisoDate,
 };
