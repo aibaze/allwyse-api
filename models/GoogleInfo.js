@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const GoogleInfoSchema = mongoose.Schema({
-  token: {
+  refresh_token: {
     type: String,
   },
   access_token: {
