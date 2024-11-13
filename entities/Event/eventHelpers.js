@@ -36,14 +36,9 @@ const createMultipleEventsMethod = async (body) => {
     });
 
     auth2Client.setCredentials({
-      refresh_token: googleInfo?.token,
+      refresh_token: googleInfo?.refresh_token,
       access_token: googleInfo?.access_token,
     });
-    // Get information about the new access token
-    const tokenInfo = await auth2Client.getTokenInfo(
-      auth2Client.credentials.access_token
-    );
-    console.log("Token Info:", tokenInfo);
 
     await calendar.events.insert({
       calendarId: "primary",

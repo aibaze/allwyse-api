@@ -25,17 +25,12 @@ const createSingleEventMethod = async (body) => {
     const googleInfo = await GoogleInfo.findOne({
       coachId: new ObjectId(coachId),
     });
-    console.log(googleInfo, "google info");
 
     auth2Client.setCredentials({
-      refresh_token: googleInfo?.token,
+      refresh_token: googleInfo?.refresh_token,
       access_token: googleInfo?.access_token,
     });
-    // Get information about the new access token
-    const tokenInfo = await auth2Client.getTokenInfo(
-      auth2Client.credentials.access_token
-    );
-    console.log("Token Info:", tokenInfo);
+
     await calendar.events.insert({
       calendarId: "primary",
       auth: auth2Client,
@@ -100,22 +95,51 @@ const getEventsByCoach = async (req, res) => {
 };
 
 const checkIfItsAuth = async (req, res) => {
-  const googleInfo = await GoogleInfo.findOne({ coachId: req.params.coachId });
+  try {
+    let message = "OK";
+    const googleInfo = await GoogleInfo.findOne({
+      coachId: req.params.coachId,
+    });
 
-  if (!googleInfo) {
-    return res.json({
-      message: "Not authorized",
+    if (!googleInfo) {
+      throw new Error("Not authorized");
+    }
+
+    if (googleInfo.expiresIn < new Date().getTime()) {
+      const newTokens = await auth2Client.refreshToken(
+        googleInfo.refresh_token
+      );
+      await GoogleInfo.updateOne(
+        {
+          _id: new ObjectId(googleInfo._id),
+        },
+        {
+          $set: {
+            expiresIn: newTokens.tokens.expiry_date,
+            access_token: newTokens.tokens.access_token,
+          },
+        }
+      );
+      message = "refreshed";
+    }
+
+    res.json({ message, error: null });
+  } catch (error) {
+    await GoogleInfo.deleteMany({ coachId: req.body.coachId });
+
+    res.json({
+      message: error.message,
       error: "Not authorized",
       statusCode: 403,
     });
   }
-  res.json({ message: "OK", error: null });
 };
+
 const googleAuth = async (req, res) => {
   try {
     const { tokens } = await auth2Client.getToken(req.body.code);
     const body = {
-      token: tokens.refresh_token,
+      refresh_token: tokens.refresh_token,
       expiresIn: tokens.expiry_date,
       access_token: tokens.access_token,
       coachId: req.body.coachId,
