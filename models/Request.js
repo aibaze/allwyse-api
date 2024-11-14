@@ -50,6 +50,12 @@ const RequestSchema = mongoose.Schema(
     requestedTime: {
       type: String,
     },
+    googleError: {
+      type: Boolean,
+    },
+    acceptSuccess: {
+      type: Boolean,
+    },
   },
   {
     timestamps: true,

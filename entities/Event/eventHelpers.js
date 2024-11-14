@@ -17,8 +17,6 @@ const calendar = google.calendar({
 const dayjs = require("dayjs");
 
 const createMultipleEventsMethod = async (body) => {
-  let googleError = true;
-
   try {
     const {
       attendees,
@@ -29,7 +27,6 @@ const createMultipleEventsMethod = async (body) => {
       description,
       coachId,
       recurrence,
-      studentId,
     } = body;
     const googleInfo = await GoogleInfo.findOne({
       coachId: new ObjectId(coachId),
@@ -49,11 +46,11 @@ const createMultipleEventsMethod = async (body) => {
         description: description,
         start: {
           dateTime: dayjs(start),
-          timeZone: userTimeZone, // TO-DO CHECK IF THIS CAN BE FIGURED OUT BY GOOGLE
+          timeZone: userTimeZone,
         },
         end: {
           dateTime: dayjs(end),
-          timeZone: userTimeZone, // TO-DO CHECK IF THIS CAN BE FIGURED OUT BY GOOGLE
+          timeZone: userTimeZone,
         },
         conferenceData: {
           createRequest: {
@@ -64,26 +61,50 @@ const createMultipleEventsMethod = async (body) => {
         recurrence: generateGoogleRecurrenceString(recurrence),
       },
     });
-
-    googleError = false;
-
-    const events = await createRecurringEvents(
-      {
-        ...body,
-        studentId,
-        startDate: body.startDate || new Date(body.start),
-        createdAt: new Date(),
-        title: `${body.studentName} (${body.description})`,
-      },
-      recurrence
-    );
-
-    return events;
   } catch (error) {
-    console.log(error.message);
-    if (googleError) {
-      await GoogleInfo.deleteOne({ coachId: new ObjectId(body.coachId) });
-    }
+    await GoogleInfo.deleteOne({ coachId: new ObjectId(body.coachId) });
+    throw new Error(error.message);
+  }
+};
+
+const createSingleEventMethod = async (body) => {
+  try {
+    const { attendees, userTimeZone, start, end, title, description, coachId } =
+      body;
+    const googleInfo = await GoogleInfo.findOne({
+      coachId: new ObjectId(coachId),
+    });
+
+    auth2Client.setCredentials({
+      refresh_token: googleInfo?.refresh_token,
+      access_token: googleInfo?.access_token,
+    });
+
+    await calendar.events.insert({
+      calendarId: "primary",
+      auth: auth2Client,
+      conferenceDataVersion: 1,
+      requestBody: {
+        summary: title,
+        description: description,
+        start: {
+          dateTime: dayjs(start),
+          timeZone: userTimeZone,
+        },
+        end: {
+          dateTime: dayjs(end),
+          timeZone: userTimeZone,
+        },
+        conferenceData: {
+          createRequest: {
+            requestId: uuid(),
+          },
+        },
+        attendees: attendees,
+      },
+    });
+  } catch (error) {
+    await GoogleInfo.deleteOne({ coachId: new ObjectId(body.coachId) });
     throw new Error(error.message);
   }
 };
@@ -205,6 +226,8 @@ function generateGoogleRecurrenceString({
 module.exports = {
   createMultipleEventsMethod,
   getShortWeekday,
+  createSingleEventMethod,
+  createRecurringEvents,
 };
 
 /* 

@@ -40,11 +40,11 @@ const createSingleEventMethod = async (body) => {
         description: description,
         start: {
           dateTime: dayjs(start),
-          timeZone: userTimeZone, // TO-DO CHECK IF THIS CAN BE FIGURED OUT BY GOOGLE
+          timeZone: userTimeZone,
         },
         end: {
           dateTime: dayjs(end),
-          timeZone: userTimeZone, // TO-DO CHECK IF THIS CAN BE FIGURED OUT BY GOOGLE
+          timeZone: userTimeZone,
         },
         conferenceData: {
           createRequest: {

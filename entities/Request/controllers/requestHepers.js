@@ -62,10 +62,11 @@ const updateRequestStakeholdersInformation = async ({
   events,
   currentRequest,
   currentService,
+  googleError,
 }) => {
   const isSingleEvent = events._id ? true : false;
   const eventIds = isSingleEvent ? [events._id] : events.map((e) => e._id);
-  await Student.updateOne(
+  const studentQuery = Student.updateOne(
     { _id: new ObjectId(client._id) },
     {
       $set: {
@@ -73,7 +74,7 @@ const updateRequestStakeholdersInformation = async ({
       },
     }
   );
-  await Coach.updateOne(
+  const coachQuery = Coach.updateOne(
     { _id: new ObjectId(currentRequest.coachId) },
     {
       $push: {
@@ -81,7 +82,7 @@ const updateRequestStakeholdersInformation = async ({
       },
     }
   );
-  await Service.updateOne(
+  const serviceQuery = Service.updateOne(
     { _id: new ObjectId(currentRequest.serviceId) },
     {
       $set: {
@@ -89,6 +90,19 @@ const updateRequestStakeholdersInformation = async ({
       },
     }
   );
+  const requestQuery = Request.updateOne(
+    {
+      _id: new ObjectId(currentRequest._id),
+    },
+    {
+      $set: {
+        googleError,
+        acceptSuccess: true,
+      },
+    }
+  );
+  const promises = [studentQuery, coachQuery, serviceQuery, requestQuery];
+  await Promise.all(promises);
 };
 
 module.exports = {

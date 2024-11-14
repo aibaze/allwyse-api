@@ -1,4 +1,5 @@
 const { Request } = require("../../../models/Request");
+const { Event } = require("../../../models/Event");
 const { ObjectId } = require("mongodb");
 const dayjs = require("dayjs");
 const {
@@ -6,9 +7,10 @@ const {
   REQUEST_TYPES,
   SEEN_REQUEST_STATUSES,
 } = require("../../../constants");
-const { createSingleEventMethod } = require("../../Event/controllers");
 const {
   createMultipleEventsMethod,
+  createSingleEventMethod,
+  createRecurringEvents,
   getShortWeekday,
 } = require("../../Event/eventHelpers");
 const { MailtrapClient } = require("mailtrap");
@@ -299,6 +301,7 @@ const updateRequestById = async (req, res) => {
 };
 
 const confirmRequest = async (req, res) => {
+  let googleError = false;
   try {
     const { currentRequest, currentService, currentCoach } =
       await getRequestInformation(req.params.requestId);
@@ -328,34 +331,42 @@ const confirmRequest = async (req, res) => {
       .set("hour", requestedTime.split(":")[0])
       .set("minute", requestedTime.split(":")[1]);
 
+    const eventBody = {
+      attendees: [
+        {
+          email: currentRequest.email,
+        },
+        {
+          email: currentCoach.email,
+        },
+      ],
+      coachId: currentRequest.coachId,
+      color: "#8E33FF",
+      description: `${currentService.title} : ${currentCoach.firstName} / ${currentRequest.name}`,
+      start: startDate.valueOf(),
+      end: startDate.valueOf() + currentService.sessionDuration * 60 * 1000,
+      startDate: startDate.toISOString(),
+      sendEmail: true,
+      serviceId: currentRequest.serviceId,
+      sessionDuration: currentService.sessionDuration,
+      studentEmail: currentRequest.email,
+      studentName: currentRequest.name,
+      title: currentService.title,
+      userTimeZone: currentCoach.timeZone || "America/New_York",
+    };
     if (currentService.sessionPeriodicity === "one-time") {
-      events = await createSingleEventMethod({
-        attendees: [
-          {
-            email: currentRequest.email,
-          },
-          {
-            email: currentCoach.email,
-          },
-        ],
-        coachId: currentRequest.coachId,
-        color: "#8E33FF",
-        description: `${currentService.title} : ${currentCoach.firstName} / ${currentRequest.name}`,
-        start: startDate.valueOf(),
-        end: startDate.valueOf() + currentService.sessionDuration * 60 * 1000,
-        startDate: startDate.toISOString(),
-        sendEmail: true,
-        serviceId: currentRequest.serviceId,
-        sessionDuration: currentService.sessionDuration,
-        studentEmail: currentRequest.email,
-        studentId: client._id,
-        studentName: currentRequest.name,
-        title: currentService.title,
-        userTimeZone: currentCoach.timeZone || "America/New_York",
-      });
-      if (events.error) {
-        throw new Error(events.error);
+      try {
+        await createSingleEventMethod(eventBody);
+      } catch (error) {
+        googleError = true;
       }
+      events = await Event.create({
+        ...eventBody,
+        studentId: client._id,
+        startDate: eventBody.startDate || new Date(eventBody.start),
+        createdAt: new Date(),
+        title: `${eventBody.studentName} (${eventBody.description})`,
+      });
     } else {
       const recurrence = {
         startDate: startDate,
@@ -369,31 +380,24 @@ const confirmRequest = async (req, res) => {
         duration: currentService.sessionDuration * 60 * 1000,
       };
 
-      events = await createMultipleEventsMethod({
-        recurrence,
-        attendees: [
-          {
-            email: currentRequest.email,
-          },
-          {
-            email: currentCoach.email,
-          },
-        ],
-        coachId: currentRequest.coachId,
-        color: "#8E33FF",
-        description: `${currentService.title} : ${currentCoach.firstName} / ${currentRequest.name}`,
-        start: startDate.valueOf(),
-        end: startDate.valueOf() + recurrence.duration,
-        startDate: startDate.toISOString(),
-        sendEmail: true,
-        serviceId: currentRequest.serviceId,
-        sessionDuration: currentService.sessionDuration,
-        studentEmail: currentRequest.email,
-        studentId: client._id,
-        studentName: currentRequest.name,
-        title: currentService.title,
-        userTimeZone: currentCoach.timeZone || "America/New_York",
-      });
+      try {
+        await createMultipleEventsMethod({
+          recurrence,
+          ...eventBody,
+        });
+      } catch (error) {
+        googleError = true;
+      }
+      events = await createRecurringEvents(
+        {
+          ...eventBody,
+          studentId: client._id,
+          startDate: eventBody.startDate || new Date(eventBody.start),
+          createdAt: new Date(),
+          title: `${eventBody.studentName} (${eventBody.description})`,
+        },
+        recurrence
+      );
     }
 
     await updateRequestStakeholdersInformation({
@@ -401,6 +405,7 @@ const confirmRequest = async (req, res) => {
       events,
       currentRequest,
       currentService,
+      googleError,
     });
 
     // Send email
@@ -419,6 +424,17 @@ const confirmRequest = async (req, res) => {
 
     res.status(201).json({ message: "Request accepted", client, events });
   } catch (error) {
+    Request.updateOne(
+      {
+        _id: new ObjectId(req.params.requestId),
+      },
+      {
+        $set: {
+          googleError,
+          acceptSuccess: false,
+        },
+      }
+    );
     res.status(500).json({ message: error.message });
   }
 };
