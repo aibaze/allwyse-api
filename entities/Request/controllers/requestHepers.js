@@ -63,6 +63,7 @@ const updateRequestStakeholdersInformation = async ({
   currentRequest,
   currentService,
   googleError,
+  completionStage,
 }) => {
   const isSingleEvent = events._id ? true : false;
   const eventIds = isSingleEvent ? [events._id] : events.map((e) => e._id);
@@ -97,7 +98,7 @@ const updateRequestStakeholdersInformation = async ({
     {
       $set: {
         googleError,
-        acceptSuccess: true,
+        completionStage: completionStage,
       },
     }
   );

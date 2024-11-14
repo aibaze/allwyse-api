@@ -53,8 +53,8 @@ const RequestSchema = mongoose.Schema(
     googleError: {
       type: Boolean,
     },
-    acceptSuccess: {
-      type: Boolean,
+    completionStage: {
+      type: String,
     },
   },
   {

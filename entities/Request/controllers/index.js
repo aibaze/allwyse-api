@@ -302,6 +302,7 @@ const updateRequestById = async (req, res) => {
 
 const confirmRequest = async (req, res) => {
   let googleError = false;
+  let completionStage = "STARTED";
   try {
     const { currentRequest, currentService, currentCoach } =
       await getRequestInformation(req.params.requestId);
@@ -310,6 +311,7 @@ const confirmRequest = async (req, res) => {
     if (!currentRequest) {
       return res.status(404).json({ message: "Request not found" });
     }
+    completionStage = "FETCHED_INFO";
 
     // UPDATE REQUEST STATUS TO ACCEPTED
     await Request.updateOne(
@@ -318,9 +320,11 @@ const confirmRequest = async (req, res) => {
       },
       { state: REQUEST_STATUSES.ACCEPTED, answer: req.body.message }
     );
+    completionStage = "UPDATED_TO_ACCEPTED";
 
     //CREATE CLIENT
     const client = await createClientFromRequest(currentRequest);
+    completionStage = "CLIENT_CREATED";
 
     // create event in progress
     let events = [];
@@ -357,6 +361,7 @@ const confirmRequest = async (req, res) => {
     if (currentService.sessionPeriodicity === "one-time") {
       try {
         await createSingleEventMethod(eventBody);
+        completionStage = "GOOGLE_SINGLE_EVENT_CREATED";
       } catch (error) {
         googleError = true;
       }
@@ -367,6 +372,7 @@ const confirmRequest = async (req, res) => {
         createdAt: new Date(),
         title: `${eventBody.studentName} (${eventBody.description})`,
       });
+      completionStage = "SINGLE_EVENT_CREATED";
     } else {
       const recurrence = {
         startDate: startDate,
@@ -385,6 +391,7 @@ const confirmRequest = async (req, res) => {
           recurrence,
           ...eventBody,
         });
+        completionStage = "GOOGLE_MULTPLE_EVENT_CREATED";
       } catch (error) {
         googleError = true;
       }
@@ -398,7 +405,10 @@ const confirmRequest = async (req, res) => {
         },
         recurrence
       );
+      completionStage = "MULTPLE_EVENT_CREATED";
     }
+
+    completionStage = "STAKE_HOLDERS_UPDATED";
 
     await updateRequestStakeholdersInformation({
       client,
@@ -406,6 +416,7 @@ const confirmRequest = async (req, res) => {
       currentRequest,
       currentService,
       googleError,
+      completionStage,
     });
 
     // Send email
@@ -431,7 +442,7 @@ const confirmRequest = async (req, res) => {
       {
         $set: {
           googleError,
-          acceptSuccess: false,
+          completionStage: completionStage,
         },
       }
     );
