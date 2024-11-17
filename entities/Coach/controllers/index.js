@@ -235,7 +235,16 @@ const getCoach = async (req, res) => {
     const query = isEmail
       ? { email: req.params.id }
       : { _id: new ObjectId(req.params.id) };
-    const coach = await Coach.findOne(query).lean();
+    let coach = await Coach.findOne(query).lean();
+
+    const coachServices = await Service.find({
+      coachId: coach._id,
+    }).lean();
+
+    coach = {
+      ...coach,
+      services: coachServices,
+    };
 
     if (req.query.isLogin) {
       Coach.updateOne(query, {
