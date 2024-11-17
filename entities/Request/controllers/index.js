@@ -345,7 +345,7 @@ const confirmRequest = async (req, res) => {
         },
       ],
       coachId: currentRequest.coachId,
-      color: "#8E33FF",
+      color: currentService.color || "#8E33FF",
       description: `${currentService.title} : ${currentCoach.firstName} / ${currentRequest.name}`,
       start: startDate.valueOf(),
       end: startDate.valueOf() + currentService.sessionDuration * 60 * 1000,
