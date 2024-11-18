@@ -432,6 +432,26 @@ const updateCoachViews = async (req, res) => {
   }
 };
 
+const updateCoachReviews = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await Coach.updateOne(
+      { _id: new ObjectId(id) },
+      {
+        $push: {
+          reviews: req.body.newReview,
+        },
+      }
+    );
+
+    res.status(200).json({ message: "OK" });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   updateCoach,
   createCoach,
@@ -440,5 +460,6 @@ module.exports = {
   getCoachBySlug,
   getCoachStats,
   checkSSOToken,
+  updateCoachReviews,
   updateCoachViews,
 };

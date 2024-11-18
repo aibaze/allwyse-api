@@ -44,8 +44,3 @@ moongose
     });
   })
   .catch((e) => console.log(e));
-
-/* sheell
-
-mongosh "mongodb+srv://globalu.spsgfxv.mongodb.net/" --apiVersion 1 --username bymelinaviera
-*/

@@ -8,6 +8,7 @@ const {
   getCoachStats,
   checkSSOToken,
   updateCoachViews,
+  updateCoachReviews,
 } = require("../controllers");
 const coachRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
@@ -24,5 +25,6 @@ coachRouter.post("/create-coach", createCoach);
 coachRouter.get("/:slug/slug", getCoachBySlug);
 coachRouter.post("/check-sso-auth", checkSSOToken);
 coachRouter.put("/views/:id", updateCoachViews);
+coachRouter.put("/reviews/:id", updateCoachReviews);
 
 module.exports = { coachRouter };

@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { StudentSchema } = require("./Student");
+const { ReviewSchema } = require("./Review");
 const { ExperienceSchema } = require("./Experience");
 const { SocialLinkSchema } = require("./SocialLink");
 
@@ -94,7 +94,8 @@ const CoachSchema = mongoose.Schema(
       },
     ],
     reviews: {
-      type: [String],
+      type: [ReviewSchema],
+      default: [],
     },
     lastLogin: {
       type: String,
