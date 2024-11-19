@@ -117,7 +117,11 @@ const updateServiceReviews = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "OK" });
+    const updatedService = await Service.findOne({
+      _id: new ObjectId(serviceId),
+    });
+
+    res.status(200).json({ message: "OK", reviews: updatedService.reviews });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });

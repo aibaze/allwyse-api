@@ -445,7 +445,9 @@ const updateCoachReviews = async (req, res) => {
       }
     );
 
-    res.status(200).json({ message: "OK" });
+    const updatedReviews = await Coach.findOne({ _id: new ObjectId(id) });
+
+    res.status(200).json({ message: "OK", reviews: updatedReviews.reviews });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
