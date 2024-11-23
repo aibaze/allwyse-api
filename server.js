@@ -14,6 +14,7 @@ const { bugReportRouter } = require("./entities/BugReport/routes");
 const { requestRouter } = require("./entities/Request/routes");
 const { internalStatRouter } = require("./entities/InternalStats/routes");
 const { postRouter } = require("./entities/Post/routes");
+const { utilRouter } = require("./entities/Utils/routes");
 
 app.use(cors({ credentials: true, origin: true }));
 app.use(express.json());
@@ -34,6 +35,7 @@ app.use("/lead", leadRouter);
 app.use("/bug-report", bugReportRouter);
 app.use("/internal-stat", internalStatRouter);
 app.use("/post", postRouter);
+app.use("/util", utilRouter);
 
 moongose
   .connect(uri)
