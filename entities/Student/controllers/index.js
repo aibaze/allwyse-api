@@ -2,7 +2,6 @@ const { MailtrapClient } = require("mailtrap");
 
 const { ObjectId } = require("mongodb");
 const { Student } = require("../../../models/Student");
-const { Event } = require("../../../models/Event");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
 
@@ -25,6 +24,50 @@ const updateStudent = async (req, res) => {
     );
     const updatedStudent = await Student.findOne({
       _id: new ObjectId(req.params.studentId),
+    });
+    res.status(200).json({ student: updatedStudent });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const updateStudentPaymentStatus = async (req, res) => {
+  try {
+    const studentId = new ObjectId(req.body.studentId);
+    const serviceId = new ObjectId(req.body.serviceId);
+
+    const student = await Student.findOne({
+      _id: studentId,
+    });
+    if (!student) {
+      throw new Error("Student not found");
+    }
+
+    if (req.body.operation === "pull") {
+      await Student.updateOne(
+        { _id: studentId },
+        {
+          $pull: {
+            unpaidServices: serviceId,
+          },
+        }
+      );
+    }
+
+    if (req.body.operation === "push") {
+      await Student.updateOne(
+        { _id: studentId },
+        {
+          $push: {
+            unpaidServices: serviceId,
+          },
+        }
+      );
+    }
+
+    const updatedStudent = await Student.findOne({
+      _id: studentId,
     });
     res.status(200).json({ student: updatedStudent });
   } catch (error) {
@@ -79,6 +122,7 @@ const createStudent = async (req, res) => {
       body = {
         ...body,
         services: [service._id],
+        unpaidServices: [service._id],
       };
     }
 
@@ -87,6 +131,16 @@ const createStudent = async (req, res) => {
       { _id: new ObjectId(coach._id) },
       { $push: { students: student._id } }
     );
+    if (body.serviceId) {
+      await Service.updateOne(
+        { _id: new ObjectId(body.serviceId) },
+        {
+          $set: {
+            seatsLeft: service.seatsLeft - 1,
+          },
+        }
+      );
+    }
 
     const TOKEN = process.env.EMAIL_API_KEY;
     const client = new MailtrapClient({ token: TOKEN });
@@ -165,4 +219,5 @@ module.exports = {
   getStudentsByCoach,
   deleteStudent,
   updateStudent,
+  updateStudentPaymentStatus,
 };

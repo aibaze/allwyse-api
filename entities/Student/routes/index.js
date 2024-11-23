@@ -3,6 +3,7 @@ const {
   createStudent,
   getStudentsByCoach,
   deleteStudent,
+  updateStudentPaymentStatus,
   updateStudent,
 } = require("../controllers");
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
@@ -15,6 +16,11 @@ studentRouter.put(
   "/update/:studentId/coach/:coachId",
   authMiddleware,
   updateStudent
+);
+studentRouter.put(
+  "/update-payment-status",
+  authMiddleware,
+  updateStudentPaymentStatus
 );
 studentRouter.delete(
   "/coach/:coachId/student/:studentId",

@@ -37,6 +37,7 @@ const createClientFromRequest = async (currentRequest) => {
       fullName: currentRequest.name,
       coachId: currentRequest.coachId,
       services: [currentRequest.serviceId],
+      unpaidServices: [currentRequest.serviceId],
       appointments: [],
     });
     client = await Student.findOne({
