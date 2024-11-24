@@ -3,6 +3,7 @@ const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
 const { Event } = require("../../../models/Event");
 const { Student } = require("../../../models/Student");
+const { executePrompt } = require("../../../utils/openAI");
 const { MailtrapClient } = require("mailtrap");
 const cookie = require("cookie");
 const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
@@ -11,6 +12,65 @@ const { getStartAndEndOfCurrentMonth } = require("../../../utils/date");
 const { OAuth2Client } = require("google-auth-library");
 
 const googleClient = new OAuth2Client();
+
+function formatExperienceForPrompt(experienceArray) {
+  if (!Array.isArray(experienceArray) || experienceArray.length === 0) {
+    return "No experience data available.";
+  }
+
+  return experienceArray
+    .map((exp) => {
+      const expertise = exp.expertise || "Unknown expertise";
+      const brand = exp.brand || "Unknown brand";
+      const year = exp.year || "Unknown year";
+
+      return `- In ${year}, worked at "${brand}" with expertise in "${expertise}".`;
+    })
+    .join("\n");
+}
+
+const handleOnboardUser = async (coachId, onboardingData) => {
+  const TOKEN = process.env.EMAIL_API_KEY;
+  const client = new MailtrapClient({ token: TOKEN });
+  const currentCoach = await Coach.findOne({ _id: coachId }).lean();
+
+  const sender = {
+    email: "melina@allwyse.io",
+    name: "Allwyse team",
+  };
+  const recipients = [
+    {
+      email: currentCoach.email,
+    },
+  ];
+  client.send({
+    from: sender,
+    to: recipients,
+    template_uuid: "875494a3-ff2c-4a0f-ac88-4929bab9f2e1",
+    template_variables: {
+      name: `${currentCoach.firstName} ${currentCoach.lastName}`,
+    },
+  });
+
+  let fineTunedDescription = "";
+  try {
+    fineTunedDescription = await executePrompt({
+      systemPrompt: `You are a specialist in copywriting, and you will write a professional description`,
+      prompt: `I am a ${onboardingData.category} coach. My specialty is ${
+        onboardingData.speciality
+      }, and I have worked since ${onboardingData.yof} in ${
+        onboardingData.category
+      }, my experience is ${formatExperienceForPrompt(
+        onboardingData.experience
+      )}. Return this wrapped in a <p> tag and it should fit in 120 token`,
+      maxTokens: 120,
+    });
+  } catch (error) {
+    fineTunedDescription = "";
+  }
+
+  return fineTunedDescription;
+};
 
 function slugify(name) {
   return name
@@ -149,27 +209,14 @@ const updateCoach = async (req, res) => {
 
     if (payload.onBoarded) {
       updatedBody["onBoarded"] = payload.onBoarded;
-      const TOKEN = process.env.EMAIL_API_KEY;
-      const client = new MailtrapClient({ token: TOKEN });
-      const currentCoach = await Coach.findOne({ _id: coachId }).lean();
-
-      const sender = {
-        email: "melina@allwyse.io",
-        name: "Allwyse team",
-      };
-      const recipients = [
-        {
-          email: currentCoach.email,
-        },
-      ];
-      client.send({
-        from: sender,
-        to: recipients,
-        template_uuid: "875494a3-ff2c-4a0f-ac88-4929bab9f2e1",
-        template_variables: {
-          name: `${currentCoach.firstName} ${currentCoach.lastName}`,
-        },
+      const fineTunedDescription = await handleOnboardUser(coachId, {
+        category: payload.category,
+        speciality: payload.speciality,
+        yof: payload.yof,
+        experience: payload.experience,
       });
+
+      updatedBody["profileInfo.description"] = fineTunedDescription;
     }
 
     if (payload.languages) {
