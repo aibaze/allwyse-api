@@ -133,6 +133,10 @@ const CoachSchema = mongoose.Schema(
     onBoarded: {
       type: Boolean,
     },
+    tokens: {
+      type: Number,
+      default: 4,
+    },
   },
   {
     timestamps: true,
