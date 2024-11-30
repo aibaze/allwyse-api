@@ -135,7 +135,7 @@ const CoachSchema = mongoose.Schema(
     },
     tokens: {
       type: Number,
-      default: 4,
+      default: 20,
     },
   },
   {

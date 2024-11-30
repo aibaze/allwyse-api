@@ -61,6 +61,32 @@ const StudentSchema = mongoose.Schema(
     phoneNumber: {
       type: String,
     },
+    bills: {
+      type: [
+        {
+          serviceId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Service",
+          },
+          serviceImg: {
+            type: String,
+          },
+          serviceTitle: {
+            type: String,
+          },
+          date: {
+            type: String,
+          },
+          amount: {
+            type: String,
+          },
+          status: {
+            type: String,
+          },
+        },
+      ],
+      default: [],
+    },
   },
   {
     timestamps: true,

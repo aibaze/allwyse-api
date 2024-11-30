@@ -4,6 +4,14 @@ const EventSchema = mongoose.Schema({
   title: {
     type: String,
   },
+  htmlLink: {
+    type: String,
+    default: "",
+  },
+  hangoutLink: {
+    type: String,
+    default: "",
+  },
   color: {
     type: String,
   },

@@ -284,14 +284,16 @@ const getCoach = async (req, res) => {
       : { _id: new ObjectId(req.params.id) };
     let coach = await Coach.findOne(query).lean();
 
-    const coachServices = await Service.find({
-      coachId: coach._id,
-    }).lean();
+    if (coach) {
+      const coachServices = await Service.find({
+        coachId: coach?._id,
+      }).lean();
 
-    coach = {
-      ...coach,
-      services: coachServices,
-    };
+      coach = {
+        ...coach,
+        services: coachServices,
+      };
+    }
 
     if (req.query.isLogin) {
       Coach.updateOne(query, {
