@@ -335,7 +335,7 @@ const confirmRequest = async (req, res) => {
       .set("hour", requestedTime.split(":")[0])
       .set("minute", requestedTime.split(":")[1]);
 
-    const eventBody = {
+    let eventBody = {
       attendees: [
         {
           email: currentRequest.email,
@@ -360,7 +360,11 @@ const confirmRequest = async (req, res) => {
     };
     if (currentService.sessionPeriodicity === "one-time") {
       try {
-        await createSingleEventMethod(eventBody);
+        const googleEventInfo = await createSingleEventMethod(eventBody);
+        eventBody = {
+          ...eventBody,
+          ...googleEventInfo,
+        };
         completionStage = "GOOGLE_SINGLE_EVENT_CREATED";
       } catch (error) {
         googleError = true;
@@ -387,10 +391,14 @@ const confirmRequest = async (req, res) => {
       };
 
       try {
-        await createMultipleEventsMethod({
+        const googleEventInfo = await createMultipleEventsMethod({
           recurrence,
           ...eventBody,
         });
+        eventBody = {
+          ...eventBody,
+          ...googleEventInfo,
+        };
         completionStage = "GOOGLE_MULTPLE_EVENT_CREATED";
       } catch (error) {
         googleError = true;

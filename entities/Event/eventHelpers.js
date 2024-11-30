@@ -28,6 +28,10 @@ const createMultipleEventsMethod = async (body) => {
       coachId,
       recurrence,
     } = body;
+    let googleEventInfo = {
+      calendarLink: "",
+      hangoutLink: "",
+    };
     const googleInfo = await GoogleInfo.findOne({
       coachId: new ObjectId(coachId),
     });
@@ -37,30 +41,38 @@ const createMultipleEventsMethod = async (body) => {
       access_token: googleInfo?.access_token,
     });
 
-    await calendar.events.insert({
-      calendarId: "primary",
-      auth: auth2Client,
-      conferenceDataVersion: 1,
-      requestBody: {
-        summary: title,
-        description: description,
-        start: {
-          dateTime: dayjs(start),
-          timeZone: userTimeZone,
-        },
-        end: {
-          dateTime: dayjs(end),
-          timeZone: userTimeZone,
-        },
-        conferenceData: {
-          createRequest: {
-            requestId: uuid(),
+    await calendar.events
+      .insert({
+        calendarId: "primary",
+        auth: auth2Client,
+        conferenceDataVersion: 1,
+        requestBody: {
+          summary: title,
+          description: description,
+          start: {
+            dateTime: dayjs(start),
+            timeZone: userTimeZone,
           },
+          end: {
+            dateTime: dayjs(end),
+            timeZone: userTimeZone,
+          },
+          conferenceData: {
+            createRequest: {
+              requestId: uuid(),
+            },
+          },
+          attendees: attendees,
+          recurrence: generateGoogleRecurrenceString(recurrence),
         },
-        attendees: attendees,
-        recurrence: generateGoogleRecurrenceString(recurrence),
-      },
-    });
+      })
+      .then((googleResponse) => {
+        googleEventInfo = {
+          htmlLink: googleResponse.data.htmlLink,
+          hangoutLink: googleResponse.data.hangoutLink,
+        };
+      });
+    return googleEventInfo;
   } catch (error) {
     await GoogleInfo.deleteOne({ coachId: new ObjectId(body.coachId) });
     throw new Error(error.message);
@@ -71,6 +83,10 @@ const createSingleEventMethod = async (body) => {
   try {
     const { attendees, userTimeZone, start, end, title, description, coachId } =
       body;
+    let googleEventInfo = {
+      calendarLink: "",
+      hangoutLink: "",
+    };
     const googleInfo = await GoogleInfo.findOne({
       coachId: new ObjectId(coachId),
     });
@@ -80,29 +96,37 @@ const createSingleEventMethod = async (body) => {
       access_token: googleInfo?.access_token,
     });
 
-    await calendar.events.insert({
-      calendarId: "primary",
-      auth: auth2Client,
-      conferenceDataVersion: 1,
-      requestBody: {
-        summary: title,
-        description: description,
-        start: {
-          dateTime: dayjs(start),
-          timeZone: userTimeZone,
-        },
-        end: {
-          dateTime: dayjs(end),
-          timeZone: userTimeZone,
-        },
-        conferenceData: {
-          createRequest: {
-            requestId: uuid(),
+    await calendar.events
+      .insert({
+        calendarId: "primary",
+        auth: auth2Client,
+        conferenceDataVersion: 1,
+        requestBody: {
+          summary: title,
+          description: description,
+          start: {
+            dateTime: dayjs(start),
+            timeZone: userTimeZone,
           },
+          end: {
+            dateTime: dayjs(end),
+            timeZone: userTimeZone,
+          },
+          conferenceData: {
+            createRequest: {
+              requestId: uuid(),
+            },
+          },
+          attendees: attendees,
         },
-        attendees: attendees,
-      },
-    });
+      })
+      .then((googleResponse) => {
+        googleEventInfo = {
+          htmlLink: googleResponse.data.htmlLink,
+          hangoutLink: googleResponse.data.hangoutLink,
+        };
+      });
+    return googleEventInfo;
   } catch (error) {
     await GoogleInfo.deleteOne({ coachId: new ObjectId(body.coachId) });
     throw new Error(error.message);
