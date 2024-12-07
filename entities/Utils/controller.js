@@ -2,6 +2,7 @@ const { sendEmail } = require("../../utils/email");
 const { executePrompt } = require("../../utils/openAI");
 const { ObjectId } = require("mongodb");
 const Coach = require("../../models/Coach");
+const { notifyError } = require("../../utils/error");
 
 const sendEmailController = async (req, res) => {
   try {
@@ -12,7 +13,8 @@ const sendEmailController = async (req, res) => {
     });
     res.status(200).json({ message: "OK" });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -33,7 +35,8 @@ const executePromptController = async (req, res) => {
     );
     res.status(200).json({ message: prompt });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };

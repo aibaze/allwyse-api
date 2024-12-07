@@ -2,6 +2,7 @@ const { Service } = require("../../../models/Service");
 const Coach = require("../../../models/Coach");
 const { isoDateToUTCisoDate } = require("../../../utils/date");
 const { ObjectId } = require("mongodb");
+const { notifyError } = require("../../../utils/error");
 
 const createService = async (req, res) => {
   try {
@@ -25,6 +26,8 @@ const createService = async (req, res) => {
 
     res.status(201).json({ service: newService });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -46,7 +49,8 @@ const updateServiceViews = async (req, res) => {
 
     res.status(200).json({ service });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -99,7 +103,8 @@ const updateService = async (req, res) => {
 
     res.status(200).json({ service: updatedService });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -123,7 +128,8 @@ const updateServiceReviews = async (req, res) => {
 
     res.status(200).json({ message: "OK", reviews: updatedService.reviews });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -137,7 +143,8 @@ const getServiceById = async (req, res) => {
 
     res.status(200).json({ service: service });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -161,7 +168,8 @@ const deleteService = async (req, res) => {
 
     res.status(200).json({ message: "Delete successfull" });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -178,7 +186,8 @@ const getServicesByCoachId = async (req, res) => {
 
     res.status(201).json({ services });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -200,7 +209,8 @@ const getServiceStats = async (req, res) => {
     });
     res.status(200).json({ ...stats });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };

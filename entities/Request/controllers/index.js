@@ -24,6 +24,7 @@ const {
   createClientFromRequest,
   updateRequestStakeholdersInformation,
 } = require("./requestHepers");
+const { notifyError } = require("../../../utils/error");
 
 const createRequest = async (req, res) => {
   try {
@@ -42,6 +43,7 @@ const createRequest = async (req, res) => {
     const request = await Request.create(payload);
     res.status(201).json({ request });
   } catch (error) {
+    notifyError(new Error(error));
     res.status(500).json({ message: error.message });
   }
 };
@@ -69,6 +71,7 @@ const deleteRequest = async (req, res) => {
     });
     res.status(200).json({ message: "Deleted" });
   } catch (error) {
+    notifyError(new Error(error));
     res.status(500).json({ message: error.message });
   }
 };
@@ -117,6 +120,8 @@ const clientAnswerCreatingNewRequest = async (req, res) => {
       request: newRequest,
     });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -159,6 +164,8 @@ const answerRequest = async (req, res) => {
       request: { ...updatedRequest, state: REQUEST_STATUSES.ANSWERED },
     });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -191,6 +198,8 @@ const getCoachRequests = async (req, res) => {
     const requests = await Request.find(matchObj);
     res.status(201).json({ requests });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -200,8 +209,11 @@ const getRequestById = async (req, res) => {
     const request = await Request.findOne({
       _id: new ObjectId(req.params.requestId),
     });
+
     res.status(201).json({ request });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -259,6 +271,8 @@ const getCoachRequestTypes = async (req, res) => {
     ];
     res.status(201).json({ labels });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -296,6 +310,8 @@ const updateRequestById = async (req, res) => {
     });
     res.status(201).json({ request });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -367,6 +383,8 @@ const confirmRequest = async (req, res) => {
         };
         completionStage = "GOOGLE_SINGLE_EVENT_CREATED";
       } catch (error) {
+        notifyError(new Error(error));
+
         googleError = true;
       }
       events = await Event.create({
@@ -401,6 +419,8 @@ const confirmRequest = async (req, res) => {
         };
         completionStage = "GOOGLE_MULTPLE_EVENT_CREATED";
       } catch (error) {
+        notifyError(new Error(error));
+
         googleError = true;
       }
       events = await createRecurringEvents(
@@ -443,6 +463,8 @@ const confirmRequest = async (req, res) => {
 
     res.status(201).json({ message: "Request accepted", client, events });
   } catch (error) {
+    notifyError(new Error(error));
+
     Request.updateOne(
       {
         _id: new ObjectId(req.params.requestId),

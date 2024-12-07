@@ -1,5 +1,6 @@
 const { Lead } = require("../../../models/Lead");
 const validator = require("validator");
+const { notifyError } = require("../../../utils/error");
 
 const createLead = async (req, res) => {
   try {
@@ -15,7 +16,8 @@ const createLead = async (req, res) => {
     const newLead = await Lead.create(req.body);
     res.status(201).json({ lead: newLead });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };

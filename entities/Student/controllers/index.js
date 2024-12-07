@@ -4,6 +4,7 @@ const { ObjectId } = require("mongodb");
 const { Student } = require("../../../models/Student");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
+const { notifyError } = require("../../../utils/error");
 
 const updateStudent = async (req, res) => {
   try {
@@ -27,7 +28,8 @@ const updateStudent = async (req, res) => {
     });
     res.status(200).json({ student: updatedStudent });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -71,7 +73,8 @@ const updateStudentPaymentStatus = async (req, res) => {
     });
     res.status(200).json({ student: updatedStudent });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -88,7 +91,8 @@ const deleteStudent = async (req, res) => {
     await Student.deleteOne({ _id: new ObjectId(req.params.studentId) });
     res.status(201).json({ message: "Client deleted" });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -153,7 +157,8 @@ const createStudent = async (req, res) => {
     });
     res.status(201).json({ student });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -210,6 +215,8 @@ const getStudentsByCoach = async (req, res) => {
 
     res.status(200).json({ students });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };

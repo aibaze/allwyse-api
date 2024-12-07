@@ -10,6 +10,7 @@ const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
 const { getPercentage } = require("../../../utils/format");
 const { getStartAndEndOfCurrentMonth } = require("../../../utils/date");
 const { OAuth2Client } = require("google-auth-library");
+const { notifyError } = require("../../../utils/error");
 
 const googleClient = new OAuth2Client();
 
@@ -146,7 +147,8 @@ const checkSSOToken = async (req, res) => {
     );
     res.status(200).json({ email: payload.email });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -180,7 +182,8 @@ const createCoach = async (req, res) => {
 
     res.status(201).json({ coach });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -270,7 +273,8 @@ const updateCoach = async (req, res) => {
     const coach = await Coach.findOne({ _id: coachId }).lean();
     res.status(201).json({ ...coach });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -316,7 +320,8 @@ const getCoach = async (req, res) => {
 
     res.status(200).json({ ...coach });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -327,7 +332,8 @@ const getCoachBySlug = async (req, res) => {
     const coach = await Coach.findOne({ slug }).lean();
     res.status(200).json({ ...coach });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -345,7 +351,8 @@ const deleteCoach = async (req, res) => {
     await Coach.deleteOne(query);
     res.status(200).json({ message: "deleted" });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -456,7 +463,8 @@ const getCoachStats = async (req, res) => {
     };
     res.status(200).json({ ...stats });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -476,7 +484,8 @@ const updateCoachViews = async (req, res) => {
 
     res.status(200).json({ message: "OK" });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };
@@ -498,7 +507,8 @@ const updateCoachReviews = async (req, res) => {
 
     res.status(200).json({ message: "OK", reviews: updatedReviews.reviews });
   } catch (error) {
-    console.log(error.message);
+    notifyError(new Error(error));
+
     res.status(500).json({ message: error.message });
   }
 };

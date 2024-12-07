@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@bugsnag/js": "^8.1.2",
+    "@bugsnag/plugin-express": "^8.1.1",
     "axios": "^1.6.3",
     "cookie": "^0.6.0",
     "cookie-parser": "^1.4.6",

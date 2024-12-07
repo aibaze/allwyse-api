@@ -5,6 +5,7 @@ const { Event } = require("../../../models/Event");
 const { GoogleInfo } = require("../../../models/GoogleInfo");
 const { ObjectId } = require("mongodb");
 const { Student } = require("../../../models/Student");
+const { notifyError } = require("../../../utils/error");
 
 const auth2Client = new google.auth.OAuth2(
   process.env.CALENAR_CLIENT_KEY,
@@ -76,6 +77,8 @@ const createSingleEventMethod = async (body) => {
     if (googleError) {
       await GoogleInfo.deleteOne({ coachId: new ObjectId(body.coachId) });
     }
+    notifyError(new Error(error));
+
     return { error: error.message };
   }
 };
@@ -125,6 +128,8 @@ const checkIfItsAuth = async (req, res) => {
 
     res.json({ message, error: null });
   } catch (error) {
+    notifyError(new Error(error));
+
     await GoogleInfo.deleteMany({ coachId: req.body.coachId });
 
     res.json({
@@ -148,6 +153,8 @@ const googleAuth = async (req, res) => {
     await GoogleInfo.create(body);
     res.json({ message: "ok", error: null });
   } catch (error) {
+    notifyError(new Error(error));
+
     res.json({ message: error.message, error: true });
   }
 };
