@@ -147,8 +147,6 @@ const checkSSOToken = async (req, res) => {
     );
     res.status(200).json({ email: payload.email });
   } catch (error) {
-    notifyError(new Error(error));
-
     res.status(500).json({ message: error.message });
   }
 };

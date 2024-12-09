@@ -128,8 +128,6 @@ const checkIfItsAuth = async (req, res) => {
 
     res.json({ message, error: null });
   } catch (error) {
-    notifyError(new Error(error));
-
     await GoogleInfo.deleteMany({ coachId: req.body.coachId });
 
     res.json({
