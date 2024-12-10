@@ -27,6 +27,9 @@ const ServiceSchema = mongoose.Schema(
     customSessionMinutes: {
       type: Number,
     },
+    sessionAmount: {
+      type: Number,
+    },
     sessionPeriodicity: {
       type: String /* hourly | course | other */,
     },
