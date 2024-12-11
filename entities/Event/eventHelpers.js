@@ -141,11 +141,18 @@ async function createRecurringEvents(eventDetails, recurrence) {
     interval = 1,
     daysOfWeek,
     duration,
+    sessionAmount,
   } = recurrence;
+
   let occurrences = [];
   let currentDate = startDate;
+  let sessionCount = 0;
 
   while (true) {
+    // Break if we've reached the session limit
+    if (sessionCount >= sessionAmount) break;
+
+    // Secondary check for endDate if provided
     if (endDate && currentDate.isAfter(dayjs(endDate))) break;
 
     // Check if the current date matches the recurrence pattern
@@ -159,6 +166,7 @@ async function createRecurringEvents(eventDetails, recurrence) {
         end: thisStartDateInMS + duration,
       };
       occurrences.push(eventInstance);
+      sessionCount++; // Increment session count
     }
 
     // Move to the next date based on the frequency and interval
@@ -227,6 +235,7 @@ function generateGoogleRecurrenceString({
   interval,
   daysOfWeek,
   endDate,
+  sessionAmount,
 }) {
   let rrule = `FREQ=${frequency.toUpperCase()}`;
 
@@ -238,7 +247,10 @@ function generateGoogleRecurrenceString({
     rrule += `;BYDAY=${daysOfWeek.join(",")}`;
   }
 
-  if (endDate) {
+  // Use COUNT instead of UNTIL if sessionAmount is provided
+  if (sessionAmount) {
+    rrule += `;COUNT=${sessionAmount}`;
+  } else if (endDate) {
     const formattedEndDate =
       new Date(endDate).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
     rrule += `;UNTIL=${formattedEndDate}`;

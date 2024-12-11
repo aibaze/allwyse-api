@@ -31,7 +31,7 @@ const ServiceSchema = mongoose.Schema(
       type: Number,
     },
     sessionPeriodicity: {
-      type: String /* hourly | course | other */,
+      type: String,
     },
     price: {
       type: String,

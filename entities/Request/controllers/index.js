@@ -406,6 +406,7 @@ const confirmRequest = async (req, res) => {
             : null,
         endDate: currentService.endDate || getFirstDateOfNextYearISO(),
         duration: currentService.sessionDuration * 60 * 1000,
+        sessionAmount: currentService.sessionAmount || undefined,
       };
 
       try {
