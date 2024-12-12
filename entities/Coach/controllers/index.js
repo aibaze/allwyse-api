@@ -117,8 +117,8 @@ const handleGoogleSSO = async (authorizationHeader) => {
   const payload = ticket.getPayload();
   return {
     email: payload.email,
-    firstName: payload.given_name,
-    lastName: payload.family_name,
+    firstName: payload.given_name || payload.email || "",
+    lastName: payload.family_name || "",
     SSO: "GOOGLE",
     profileInfo: {
       profileImg: payload.picture,
@@ -167,7 +167,10 @@ const createCoach = async (req, res) => {
       );
     }
 
-    let slug = createSlug(reqBody.firstName, reqBody.lastName);
+    let slug = createSlug(
+      reqBody.firstName || reqBody.email || "",
+      reqBody.lastName || ""
+    );
     const existingSlug = await Coach.findOne({ slug });
     if (existingSlug) {
       slug = await handleUniqueSlug(slug);
