@@ -286,6 +286,12 @@ const getCoach = async (req, res) => {
       : { _id: new ObjectId(req.params.id) };
     let coach = await Coach.findOne(query).lean();
 
+    if (!coach) {
+      notifyError(new Error(`Coach ${req.params.id} not found`));
+
+      res.status(404).json({ message: "not found" });
+    }
+
     if (coach) {
       const coachServices = await Service.find({
         coachId: coach?._id,
@@ -303,7 +309,7 @@ const getCoach = async (req, res) => {
       });
     }
 
-    const cookieName = !coach.SSO ? "x_auth_token" : "x_auth_token_sso";
+    const cookieName = !coach?.SSO ? "x_auth_token" : "x_auth_token_sso";
     const authorizationHeader = req.header(cookieName);
     let minute = 60 * 1000;
     res.setHeader(
