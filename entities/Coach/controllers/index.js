@@ -333,6 +333,18 @@ const getCoach = async (req, res) => {
   }
 };
 
+const userEmailExists = async (req, res) => {
+  try {
+    const email = req.params.email;
+    const userExists = await Coach.findOne({ email }).lean();
+    res.status(200).json({ exists: !!userExists, authMethod: userExists?.SSO });
+  } catch (error) {
+    notifyError(new Error(error));
+
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getCoachBySlug = async (req, res) => {
   try {
     const slug = req.params.slug;
@@ -530,4 +542,5 @@ module.exports = {
   checkSSOToken,
   updateCoachReviews,
   updateCoachViews,
+  userEmailExists,
 };
