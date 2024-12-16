@@ -292,7 +292,9 @@ const getCoach = async (req, res) => {
     if (!coach) {
       notifyError(new Error(`Coach ${req.params.id} not found`));
 
-      res.status(404).json({ message: "not found" });
+      const error = new Error(`Coach ${req.params.id} not found`);
+      error.status = 404;
+      throw error;
     }
 
     if (coach) {
@@ -329,7 +331,7 @@ const getCoach = async (req, res) => {
   } catch (error) {
     notifyError(new Error(error));
 
-    res.status(500).json({ message: error.message });
+    res.status(error?.status || 500).json({ message: error.message });
   }
 };
 
