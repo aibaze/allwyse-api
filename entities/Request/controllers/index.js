@@ -392,14 +392,19 @@ const confirmRequest = async (req, res) => {
 
         googleError = true;
       }
-      events = await Event.create({
-        ...eventBody,
-        studentId: client._id,
-        startDate: eventBody.startDate || new Date(eventBody.start),
-        createdAt: new Date(),
-        title: `${eventBody.studentName} (${eventBody.description})`,
-      });
-      completionStage = "SINGLE_EVENT_CREATED";
+
+      try {
+        events = await Event.create({
+          ...eventBody,
+          studentId: client._id,
+          startDate: eventBody.startDate || new Date(eventBody.start),
+          createdAt: new Date(),
+          title: `${eventBody.studentName} (${eventBody.description})`,
+        });
+        completionStage = "SINGLE_EVENT_CREATED";
+      } catch (error) {
+        completionStage = "ERROR_ON_SINGLE_EVENT_CREATED";
+      }
     } else {
       const recurrence = {
         startDate: startDate,
@@ -429,20 +434,24 @@ const confirmRequest = async (req, res) => {
 
         googleError = true;
       }
-      events = await createRecurringEvents(
-        {
-          ...eventBody,
-          studentId: client._id,
-          startDate: eventBody.startDate || new Date(eventBody.start),
-          createdAt: new Date(),
-          title: `${eventBody.studentName} (${eventBody.description})`,
-        },
-        recurrence
-      );
-      completionStage = "MULTPLE_EVENT_CREATED";
+      try {
+        events = await createRecurringEvents(
+          {
+            ...eventBody,
+            studentId: client._id,
+            startDate: eventBody.startDate || new Date(eventBody.start),
+            createdAt: new Date(),
+            title: `${eventBody.studentName} (${eventBody.description})`,
+          },
+          recurrence
+        );
+        completionStage = "MULTPLE_EVENT_CREATED";
+      } catch (error) {
+        completionStage = "ERROR_ON_MULTPLE_EVENT_CREATED";
+      }
     }
 
-    completionStage = "STAKE_HOLDERS_UPDATED";
+    completionStage = "STAKE_HOLDERS_ABOUT_TO_BE_UPDATED";
 
     await updateRequestStakeholdersInformation({
       client,
@@ -479,6 +488,7 @@ const confirmRequest = async (req, res) => {
         $set: {
           googleError,
           completionStage: completionStage,
+          error: true,
         },
       }
     );
