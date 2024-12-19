@@ -351,6 +351,11 @@ const confirmRequest = async (req, res) => {
       .set("hour", requestedTime.split(":")[0])
       .set("minute", requestedTime.split(":")[1]);
 
+    const realSessionDuration =
+      currentService.sessionDuration === "Custom"
+        ? currentService.customSessionMinutes
+        : currentService.sessionDuration;
+
     let eventBody = {
       attendees: [
         {
@@ -364,11 +369,11 @@ const confirmRequest = async (req, res) => {
       color: currentService.color || "#8E33FF",
       description: `${currentService.title} : ${currentCoach.firstName} / ${currentRequest.name}`,
       start: startDate.valueOf(),
-      end: startDate.valueOf() + currentService.sessionDuration * 60 * 1000,
+      end: startDate.valueOf() + realSessionDuration * 60 * 1000,
       startDate: startDate.toISOString(),
       sendEmail: true,
       serviceId: currentRequest.serviceId,
-      sessionDuration: currentService.sessionDuration,
+      sessionDuration: realSessionDuration,
       studentEmail: currentRequest.email,
       studentName: currentRequest.name,
       title: currentService.title,
@@ -405,7 +410,7 @@ const confirmRequest = async (req, res) => {
             ? [getShortWeekday(startDate)]
             : null,
         endDate: currentService.endDate || getFirstDateOfNextYearISO(),
-        duration: currentService.sessionDuration * 60 * 1000,
+        duration: realSessionDuration * 60 * 1000,
         sessionAmount: currentService.sessionAmount || undefined,
       };
 
@@ -466,7 +471,7 @@ const confirmRequest = async (req, res) => {
   } catch (error) {
     notifyError(new Error(error));
 
-    Request.updateOne(
+    await Request.updateOne(
       {
         _id: new ObjectId(req.params.requestId),
       },
