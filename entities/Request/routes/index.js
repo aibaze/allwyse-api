@@ -9,6 +9,7 @@ const {
   deleteRequest,
   clientAnswerCreatingNewRequest,
   confirmRequest,
+  getRequestsByServiceId,
 } = require("../controllers");
 const requestRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
@@ -23,6 +24,7 @@ requestRouter.get("/:requestId", getRequestById);
 requestRouter.put("/update/:requestId", authMiddleware, updateRequestById);
 requestRouter.put("/confirm/:requestId", authMiddleware, confirmRequest);
 requestRouter.get("/coach/:coachId", authMiddleware, getCoachRequests);
+requestRouter.get("/coach/:serviceId", authMiddleware, getRequestsByServiceId);
 requestRouter.delete("/:requestId", authMiddleware, deleteRequest);
 requestRouter.get(
   "/coach/:coachId/types",

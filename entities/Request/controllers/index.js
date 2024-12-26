@@ -218,6 +218,20 @@ const getRequestById = async (req, res) => {
   }
 };
 
+const getRequestsByServiceId = async (req, res) => {
+  try {
+    const requests = await Request.findOne({
+      serviceId: new ObjectId(req.params.serviceId),
+    });
+
+    res.status(201).json({ requests });
+  } catch (error) {
+    notifyError(new Error(error));
+
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const getCoachRequestTypes = async (req, res) => {
   try {
     const matchObj = {
@@ -505,4 +519,5 @@ module.exports = {
   deleteRequest,
   clientAnswerCreatingNewRequest,
   confirmRequest,
+  getRequestsByServiceId,
 };
