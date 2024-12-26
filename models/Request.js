@@ -56,6 +56,9 @@ const RequestSchema = mongoose.Schema(
     completionStage: {
       type: String,
     },
+    questionary: {
+      type: [{ question: String, answer: String }],
+    },
   },
   {
     timestamps: true,
