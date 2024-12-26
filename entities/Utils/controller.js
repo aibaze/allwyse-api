@@ -21,14 +21,20 @@ const sendEmailController = async (req, res) => {
 
 const executePromptController = async (req, res) => {
   try {
+    const currentCoach = await Coach.findOne({
+      _id: new ObjectId(req.body.coachId),
+    });
+
+    if (!currentCoach || currentCoach.tokens <= 0) {
+      throw new Error("Not enough tokens");
+    }
+
     const prompt = await executePrompt({
       systemPrompt: req.body.systemPrompt,
       prompt: req.body.prompt,
       maxTokens: req.body.maxTokens,
     });
-    const currentCoach = await Coach.findOne({
-      _id: new ObjectId(req.body.coachId),
-    });
+
     await Coach.updateOne(
       { _id: new ObjectId(req.body.coachId) },
       { $set: { tokens: currentCoach.tokens - 1 } }
