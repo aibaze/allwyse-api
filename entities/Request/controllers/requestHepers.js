@@ -51,16 +51,29 @@ const createClientFromRequest = async (currentRequest) => {
       coachId: currentRequest.coachId,
     });
   } else {
-    await Student.updateOne(
-      { _id: new ObjectId(client._id) },
-      {
-        $push: {
+    const clientServices = client.services.map((service) => service.toString());
+
+    const clientHasService = clientServices.includes(
+      currentRequest.serviceId?.toString
+    );
+    const payload = clientHasService
+      ? {
+          questionnaires: {
+            _id: new ObjectId(),
+            questionnaire: currentRequest.questionnaire,
+          },
+        }
+      : {
           services: currentRequest.serviceId,
           questionnaires: {
             _id: new ObjectId(),
             questionnaire: currentRequest.questionnaire,
           },
-        },
+        };
+    await Student.updateOne(
+      { _id: new ObjectId(client._id) },
+      {
+        $push: payload,
       }
     );
   }
