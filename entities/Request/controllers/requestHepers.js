@@ -24,6 +24,29 @@ const getRequestInformation = async (requestId) => {
   return { currentRequest, currentService, currentCoach };
 };
 
+const getCurrentClientPayload = (client, currentRequest) => {
+  const clientServices = client.services.map((service) => service.toString());
+
+  const clientHasService = clientServices.includes(
+    currentRequest.serviceId?.toString
+  );
+  const payload = clientHasService
+    ? {
+        questionnaires: {
+          _id: new ObjectId(),
+          questionnaire: currentRequest.questionnaire,
+        },
+      }
+    : {
+        services: currentRequest.serviceId,
+        questionnaires: {
+          _id: new ObjectId(),
+          questionnaire: currentRequest.questionnaire,
+        },
+      };
+  return payload;
+};
+
 const createClientFromRequest = async (currentRequest) => {
   let client = await Student.findOne({
     email: currentRequest.email,
@@ -51,25 +74,7 @@ const createClientFromRequest = async (currentRequest) => {
       coachId: currentRequest.coachId,
     });
   } else {
-    const clientServices = client.services.map((service) => service.toString());
-
-    const clientHasService = clientServices.includes(
-      currentRequest.serviceId?.toString
-    );
-    const payload = clientHasService
-      ? {
-          questionnaires: {
-            _id: new ObjectId(),
-            questionnaire: currentRequest.questionnaire,
-          },
-        }
-      : {
-          services: currentRequest.serviceId,
-          questionnaires: {
-            _id: new ObjectId(),
-            questionnaire: currentRequest.questionnaire,
-          },
-        };
+    const payload = getCurrentClientPayload(client, currentRequest);
     await Student.updateOne(
       { _id: new ObjectId(client._id) },
       {
