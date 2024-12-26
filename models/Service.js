@@ -52,7 +52,7 @@ const ServiceSchema = mongoose.Schema(
     tags: {
       type: [String],
     },
-    questionary: {
+    questionnaire: {
       type: [String],
     },
     published: {

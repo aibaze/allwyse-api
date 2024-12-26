@@ -56,7 +56,7 @@ const RequestSchema = mongoose.Schema(
     completionStage: {
       type: String,
     },
-    questionary: {
+    questionnaire: {
       type: [{ question: String, answer: String }],
     },
   },

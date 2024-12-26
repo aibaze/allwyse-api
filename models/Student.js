@@ -34,7 +34,7 @@ const StudentSchema = mongoose.Schema(
         ref: "Event",
       },
     ],
-    questionaries: [
+    questionnaire: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Event",
