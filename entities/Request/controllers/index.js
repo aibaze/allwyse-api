@@ -220,7 +220,7 @@ const getRequestById = async (req, res) => {
 
 const getRequestsByServiceId = async (req, res) => {
   try {
-    const requests = await Request.findOne({
+    const requests = await Request.find({
       serviceId: new ObjectId(req.params.serviceId),
     });
 
