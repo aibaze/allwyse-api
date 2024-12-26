@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { QuestionnaireGroupSchema } = require("./Questionnaire");
 
 const StudentSchema = mongoose.Schema(
   {
@@ -34,12 +35,9 @@ const StudentSchema = mongoose.Schema(
         ref: "Event",
       },
     ],
-    questionnaire: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Event",
-      },
-    ],
+    questionnaires: {
+      type: [QuestionnaireGroupSchema],
+    },
     profileImg: {
       type: String,
     },

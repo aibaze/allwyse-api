@@ -39,6 +39,12 @@ const createClientFromRequest = async (currentRequest) => {
       services: [currentRequest.serviceId],
       unpaidServices: [currentRequest.serviceId],
       appointments: [],
+      questionnaires: [
+        {
+          _id: new ObjectId(),
+          questionnaire: currentRequest.questionnaire,
+        },
+      ],
     });
     client = await Student.findOne({
       email: currentRequest.email,
@@ -50,6 +56,10 @@ const createClientFromRequest = async (currentRequest) => {
       {
         $push: {
           services: currentRequest.serviceId,
+          questionnaires: {
+            _id: new ObjectId(),
+            questionnaire: currentRequest.questionnaire,
+          },
         },
       }
     );

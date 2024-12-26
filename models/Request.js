@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { REQUEST_STATUSES } = require("../constants");
+const { QuestionnaireSchema } = require("./Questionnaire");
 
 const RequestSchema = mongoose.Schema(
   {
@@ -57,7 +58,7 @@ const RequestSchema = mongoose.Schema(
       type: String,
     },
     questionnaire: {
-      type: [{ question: String, answer: String }],
+      type: [QuestionnaireSchema],
     },
   },
   {
