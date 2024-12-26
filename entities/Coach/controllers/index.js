@@ -270,6 +270,14 @@ const updateCoach = async (req, res) => {
       updatedBody["profileInfo.timeZone"] = payload.timeZone;
     }
 
+    if (payload.firstName) {
+      updatedBody["firstName"] = payload.firstName;
+    }
+
+    if (payload.lastName) {
+      updatedBody["lastName"] = payload.lastName;
+    }
+
     await Coach.updateOne({ _id: coachId }, { $set: updatedBody });
     const coach = await Coach.findOne({ _id: coachId }).lean();
     res.status(201).json({ ...coach });
