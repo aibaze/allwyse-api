@@ -28,6 +28,7 @@ const { notifyError } = require("../../../utils/error");
 const createRequest = async (req, res) => {
   try {
     let payload = req.body;
+
     if (payload.serviceId) {
       const service = await Service.findOne({
         _id: new ObjectId(payload.serviceId),
@@ -47,7 +48,7 @@ const createRequest = async (req, res) => {
       templateVariables: {
         clientName: payload.name,
         requestType: payload.priority?.toLowerCase(),
-        serviceTitle: service.title,
+        serviceTitle: payload?.serviceTitle || "your",
         message: payload.message,
       },
     });
