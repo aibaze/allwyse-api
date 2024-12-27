@@ -42,8 +42,11 @@ const createRequest = async (req, res) => {
     }
 
     const request = await Request.create(payload);
+    const coach = await Coach.findOne({
+      _id: new ObjectId(request.coachId),
+    });
     await sendEmailTemplate({
-      recipientEmail: payload.email,
+      recipientEmail: coach.email,
       templateId: EMAIL_TEMPLATES.CREATED_REQUEST,
       templateVariables: {
         clientName: payload.name,
