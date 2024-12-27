@@ -39,7 +39,18 @@ const createRequest = async (req, res) => {
         serviceTitle: service.title,
       };
     }
+
     const request = await Request.create(payload);
+    await sendEmailTemplate({
+      recipientEmail: payload.email,
+      templateId: EMAIL_TEMPLATES.CREATED_REQUEST,
+      templateVariables: {
+        clientName: payload.name,
+        requestType: payload.priority?.toLowerCase(),
+        serviceTitle: service.title,
+        message: payload.message,
+      },
+    });
     res.status(201).json({ request });
   } catch (error) {
     notifyError(new Error(error));
