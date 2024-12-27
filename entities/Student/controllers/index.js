@@ -146,15 +146,15 @@ const createStudent = async (req, res) => {
       );
     }
 
-    const TOKEN = process.env.EMAIL_API_KEY;
-    const client = new MailtrapClient({ token: TOKEN });
-
+    // const TOKEN = process.env.EMAIL_API_KEY;
+    // const client = new MailtrapClient({ token: TOKEN });
+    /* 
     await client.send({
       from: { email: "info@allwyse.io" },
       to: [{ email: student.email }],
       subject: `Hello from ${coach.firstName} ${coach.lastName} coaching platform !`,
       text: email,
-    });
+    }); */
     res.status(201).json({ student });
   } catch (error) {
     notifyError(new Error(error));

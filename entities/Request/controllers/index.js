@@ -479,7 +479,7 @@ const confirmRequest = async (req, res) => {
     });
 
     // Send email
-    const clientAnswerUrl = `www.allwyse.io/info/${
+    const clientAnswerUrl = `www.app.allwyse.io/info/${
       currentCoach.slug
     }/services/${
       currentRequest.serviceId
