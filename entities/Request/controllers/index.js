@@ -13,10 +13,9 @@ const {
   createRecurringEvents,
   getShortWeekday,
 } = require("../../Event/eventHelpers");
-const { MailtrapClient } = require("mailtrap");
 const Coach = require("../../../models/Coach");
 const { Service } = require("../../../models/Service");
-const { sendEmail } = require("../../../utils/email");
+const { sendEmailTemplate, EMAIL_TEMPLATES } = require("../../../utils/email");
 const { isoDateToUTCisoDate } = require("../../../utils/date");
 const { getFirstDateOfNextYearISO } = require("../../../utils/date");
 const {
@@ -107,13 +106,14 @@ const clientAnswerCreatingNewRequest = async (req, res) => {
     await Request.create(newRequest);
 
     // Send email
-    const TOKEN = process.env.EMAIL_API_KEY;
-    const client = new MailtrapClient({ token: TOKEN });
-    await client.send({
-      from: { email: "info@allwyse.io" },
-      to: [{ email: coach.email }],
-      subject: `Hello ${coach.firstName} ${coach.lastName}, ${previousRequest.name} answered your message  !`,
-      html: `${req.body.message} <br/> <p>To answer ${previousRequest.name} question, click  <a href="www.allwyse.io/requests" />here</a></p>`,
+    await sendEmailTemplate({
+      recipientEmail: coach.email,
+      templateId: EMAIL_TEMPLATES.CLIENT_ANSWERING_CREATING_REQUEST,
+      templateVariables: {
+        clientName: previousRequest.name,
+        coachName: `${coach.firstName} ${coach.lastName}`,
+        answer: req.body.message,
+      },
     });
 
     res.status(200).json({
@@ -135,17 +135,19 @@ const answerRequest = async (req, res) => {
     });
 
     // Send email
-    const TOKEN = process.env.EMAIL_API_KEY;
-    const client = new MailtrapClient({ token: TOKEN });
-    const clientAnswerUrl = `www.allwyse.io/info/${coach.slug}/services/${
+    const clientAnswerUrl = `www.app.allwyse.io/info/${coach.slug}/services/${
       request.serviceId
     }?fromRequestId=${request._id.toString()}`;
 
-    await client.send({
-      from: { email: "info@allwyse.io" },
-      to: [{ email: request.email }],
-      subject: `Hello ${request.name},Here is the answer of your request for ${coach.firstName} ${coach.lastName}  !`,
-      html: `${req.body.message} <br/> <p>To keep chating with ${coach.firstName} ${coach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a></p>`,
+    await sendEmailTemplate({
+      recipientEmail: request.email,
+      templateId: EMAIL_TEMPLATES.COACH_ANSWERING_REQUEST,
+      templateVariables: {
+        coachName: `${coach.firstName} ${coach.lastName}`,
+        clientName: request.name,
+        answer: req.body.message,
+        answerUrl: clientAnswerUrl,
+      },
     });
 
     // Update request status to ANSWERED
@@ -482,12 +484,15 @@ const confirmRequest = async (req, res) => {
     }/services/${
       currentRequest.serviceId
     }?fromRequestId=${currentRequest._id.toString()}`;
-    await sendEmail({
-      to: currentRequest.email,
-      subject: `Hello ${currentRequest.name},Here is the answer of your request for ${currentCoach.firstName} ${currentCoach.lastName}  ! `,
-      html: `${req.body.message} <br/> 
-      <p>Your appointment is confirmed </p>
-      <br/> <p>To keep chating with ${currentCoach.firstName} ${currentCoach.lastName} in its plaform, click <a href="${clientAnswerUrl}">here</a> and submit "i have a question button"</p> `,
+    await sendEmailTemplate({
+      recipientEmail: currentRequest.email,
+      templateId: EMAIL_TEMPLATES.CONFIRM_REQUEST,
+      templateVariables: {
+        coachName: `${currentCoach.firstName} ${currentCoach.lastName}`,
+        clientName: currentRequest.name,
+        answer: req.body.message,
+        answerUrl: clientAnswerUrl,
+      },
     });
 
     res.status(201).json({ message: "Request accepted", client, events });
