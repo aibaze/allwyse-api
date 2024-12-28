@@ -24,6 +24,11 @@ const convertHtmlToText = (html, fallbackText = "") => {
 
     // Handle special cases before getting text
 
+    // Add spacing after paragraphs to ensure text doesn't get squished together
+    root.querySelectorAll("p").forEach((p) => {
+      p.set_content(p.text.trim() + "\n\n");
+    });
+
     // Replace <br> with newlines
     root.querySelectorAll("br").forEach((el) => {
       el.replaceWith("\n");
