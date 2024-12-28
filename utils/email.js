@@ -1,10 +1,12 @@
 const { MailtrapClient } = require("mailtrap");
+const { convertHtmlToText } = require("./format");
 
 const EMAIL_TEMPLATES = {
   COACH_ANSWERING_REQUEST: "9940c366-8bff-4041-8937-9be9d13266f5",
   CLIENT_ANSWERING_CREATING_REQUEST: "8b51a8b0-84ae-44c0-873b-76d8cc113825",
   CONFIRM_REQUEST: "e88c7558-0644-47f4-ad75-7c58ee682163",
   CREATED_REQUEST: "d586749a-d733-4a3a-b191-58c6e3daed96",
+  ONBOARDING: "875494a3-ff2c-4a0f-ac88-4929bab9f2e1",
 };
 
 const sendEmail = async (options) => {
@@ -52,11 +54,24 @@ const sendEmailTemplate = async (options) => {
     throw new Error("Template id is required");
   }
 
+  let variables = options.templateVariables;
+  if (!variables) {
+    variables = {};
+  }
+
+  if (variables.message) {
+    variables.message = convertHtmlToText(variables.message, variables.message);
+  }
+
+  if (variables.answer) {
+    variables.answer = convertHtmlToText(variables.answer, variables.answer);
+  }
+
   await emailClient.send({
     from: sender,
     to: recipients,
     template_uuid: options.templateId,
-    template_variables: options.templateVariables,
+    template_variables: variables,
   });
 };
 
