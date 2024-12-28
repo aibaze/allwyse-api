@@ -4,14 +4,13 @@ const { Service } = require("../../../models/Service");
 const { Event } = require("../../../models/Event");
 const { Student } = require("../../../models/Student");
 const { executePrompt } = require("../../../utils/openAI");
-const { MailtrapClient } = require("mailtrap");
 const cookie = require("cookie");
 const { getCurrentWeek, getCurrentDayBounds } = require("../../../utils/date");
 const { getPercentage } = require("../../../utils/format");
 const { getStartAndEndOfCurrentMonth } = require("../../../utils/date");
 const { OAuth2Client } = require("google-auth-library");
 const { notifyError } = require("../../../utils/error");
-
+const { sendEmailTemplate, EMAIL_TEMPLATES } = require("../../../utils/email");
 const googleClient = new OAuth2Client();
 
 function formatExperienceForPrompt(experienceArray) {
@@ -31,24 +30,12 @@ function formatExperienceForPrompt(experienceArray) {
 }
 
 const handleOnboardUser = async (coachId, onboardingData) => {
-  const TOKEN = process.env.EMAIL_API_KEY;
-  const client = new MailtrapClient({ token: TOKEN });
   const currentCoach = await Coach.findOne({ _id: coachId }).lean();
 
-  const sender = {
-    email: "melina@allwyse.io",
-    name: "Allwyse team",
-  };
-  const recipients = [
-    {
-      email: currentCoach.email,
-    },
-  ];
-  client.send({
-    from: sender,
-    to: recipients,
-    template_uuid: "875494a3-ff2c-4a0f-ac88-4929bab9f2e1",
-    template_variables: {
+  sendEmailTemplate({
+    recipientEmail: currentCoach.email,
+    templateId: EMAIL_TEMPLATES.ONBOARDING,
+    templateVariables: {
       name: `${currentCoach.firstName} ${currentCoach.lastName}`,
     },
   });
