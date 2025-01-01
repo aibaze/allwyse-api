@@ -1,6 +1,7 @@
 const { Lead } = require("../../../models/Lead");
 const validator = require("validator");
 const { notifyError } = require("../../../utils/error");
+const { sendEmailTemplate, EMAIL_TEMPLATES } = require("../../../utils/email");
 
 const createLead = async (req, res) => {
   let existingLead = undefined;
@@ -15,6 +16,10 @@ const createLead = async (req, res) => {
     }
 
     const newLead = await Lead.create(req.body);
+    await sendEmailTemplate({
+      recipientEmail: req.body?.email,
+      templateId: EMAIL_TEMPLATES.SITE_LEAD_MAGNET,
+    });
     res.status(201).json({ lead: newLead });
   } catch (error) {
     notifyError(new Error(error));

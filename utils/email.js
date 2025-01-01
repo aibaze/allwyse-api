@@ -7,6 +7,7 @@ const EMAIL_TEMPLATES = {
   CONFIRM_REQUEST: "e88c7558-0644-47f4-ad75-7c58ee682163",
   CREATED_REQUEST: "d586749a-d733-4a3a-b191-58c6e3daed96",
   ONBOARDING: "875494a3-ff2c-4a0f-ac88-4929bab9f2e1",
+  SITE_LEAD_MAGNET: "b9636306-3fb4-4f67-918e-73774a8533b6",
 };
 
 const sendEmail = async (options) => {
