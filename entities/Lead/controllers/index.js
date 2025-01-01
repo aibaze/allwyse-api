@@ -3,14 +3,15 @@ const validator = require("validator");
 const { notifyError } = require("../../../utils/error");
 
 const createLead = async (req, res) => {
+  let existingLead = undefined;
   try {
     const isValidEmail = validator.isEmail(req.body?.email);
     if (!isValidEmail) {
       throw new Error("Invalid email");
     }
-    const existingLead = await Lead.findOne({ email: req.body.email });
+    existingLead = await Lead.findOne({ email: req.body.email });
     if (existingLead) {
-      throw new Error("This email is already suscribed to our newsletter.");
+      throw new Error("This email is already suscribed.");
     }
 
     const newLead = await Lead.create(req.body);
@@ -18,7 +19,7 @@ const createLead = async (req, res) => {
   } catch (error) {
     notifyError(new Error(error));
 
-    res.status(500).json({ message: error.message });
+    res.status(existingLead ? 400 : 500).json({ message: error.message });
   }
 };
 
