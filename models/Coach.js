@@ -137,6 +137,52 @@ const CoachSchema = mongoose.Schema(
       type: Number,
       default: 20,
     },
+    subscription: {
+      subscribed: {
+        type: Boolean,
+        default: false,
+      },
+      coupon: {
+        type: String,
+        default: null,
+      },
+      createdAt: {
+        type: Date,
+        default: null,
+      },
+      cutoff: {
+        type: Date,
+        default: null,
+      },
+      priceId: {
+        type: String,
+        default: null,
+      },
+      recurrence: {
+        type: String,
+        default: null,
+      },
+      amountInCents: {
+        type: Number,
+        default: null,
+      },
+      productId: {
+        type: String,
+        default: null,
+      },
+      productName: {
+        type: String,
+        default: null,
+      },
+      stripeId: {
+        type: String,
+        default: null,
+      },
+      trialEnd: {
+        type: Date,
+        default: null,
+      },
+    },
   },
   {
     timestamps: true,
