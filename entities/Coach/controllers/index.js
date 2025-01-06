@@ -254,7 +254,7 @@ const updateCoach = async (req, res) => {
     }
 
     if (payload.timeZone) {
-      updatedBody["profileInfo.timeZone"] = payload.timeZone;
+      updatedBody["timeZone"] = payload.timeZone;
     }
 
     if (payload.firstName) {
