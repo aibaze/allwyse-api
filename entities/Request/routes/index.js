@@ -13,6 +13,7 @@ const {
 } = require("../controllers");
 const requestRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
+const ownershipMiddleware = require("../../../middlewares/OwnershipMiddleware");
 
 // PUBLIC ROUTES
 requestRouter.post("/", createRequest);
@@ -23,7 +24,7 @@ requestRouter.get("/:requestId", getRequestById);
 // PRIVATE ROUTES
 requestRouter.put("/update/:requestId", authMiddleware, updateRequestById);
 requestRouter.put("/confirm/:requestId", authMiddleware, confirmRequest);
-requestRouter.get("/coach/:coachId", authMiddleware, getCoachRequests);
+requestRouter.get("/coach/:coachId", authMiddleware,ownershipMiddleware, getCoachRequests);
 requestRouter.get(
   "/service/:serviceId",
   authMiddleware,

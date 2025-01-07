@@ -8,13 +8,15 @@ const {
 } = require("../controllers");
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
 const studentRouter = express.Router();
+const ownershipMiddleware = require("../../../middlewares/OwnershipMiddleware");
 
 // PUBLIC ROUTES
 studentRouter.post("/", authMiddleware, createStudent);
-studentRouter.get("/coach/:coachId", authMiddleware, getStudentsByCoach);
+studentRouter.get("/coach/:coachId", authMiddleware, ownershipMiddleware,getStudentsByCoach);
 studentRouter.put(
   "/update/:studentId/coach/:coachId",
   authMiddleware,
+  ownershipMiddleware,
   updateStudent
 );
 studentRouter.put(
@@ -25,6 +27,7 @@ studentRouter.put(
 studentRouter.delete(
   "/coach/:coachId/student/:studentId",
   authMiddleware,
+  ownershipMiddleware,
   deleteStudent
 );
 

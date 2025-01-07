@@ -11,6 +11,7 @@ const {
 } = require("../controllers");
 const serviceRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
+const ownershipMiddleware = require("../../../middlewares/OwnershipMiddleware");
 
 //ROUTES
 serviceRouter.post(
@@ -23,6 +24,7 @@ serviceRouter.get("/:serviceId", getServiceById);
 serviceRouter.delete(
   "/:serviceId/coach/:coachId",
   authMiddleware,
+  ownershipMiddleware,
   deleteService
 );
 

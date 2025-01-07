@@ -3,7 +3,6 @@ const {
   createCoach,
   updateCoach,
   getCoach,
-  deleteCoach,
   getCoachBySlug,
   getCoachStats,
   checkSSOToken,
@@ -13,13 +12,14 @@ const {
 } = require("../controllers");
 const coachRouter = express.Router();
 const authMiddleware = require("../../../middlewares/AuthMiddleware");
+const ownershipMiddleware = require("../../../middlewares/OwnershipMiddleware");
 
 //ROUTES
 
-coachRouter.put("/update-coach/:id", authMiddleware, updateCoach);
-coachRouter.get("/:id", authMiddleware, getCoach);
-coachRouter.delete("/:id", authMiddleware, deleteCoach);
-coachRouter.get("/stats/:id", authMiddleware, getCoachStats);
+coachRouter.put("/update-coach/:id", authMiddleware,ownershipMiddleware, updateCoach);
+coachRouter.get("/:id", authMiddleware,ownershipMiddleware, getCoach);
+//coachRouter.delete("/:id", authMiddleware, deleteCoach);
+coachRouter.get("/stats/:id", authMiddleware,ownershipMiddleware, getCoachStats);
 
 // PUBLIC ROUTES
 coachRouter.post("/create-coach", createCoach);
