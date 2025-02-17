@@ -38,7 +38,7 @@ utilRouter.get("/vapi/assistants",async (req,res)=>{
       }
     })
     console.log("pas")
-    res.status(200).json({calls:data})
+    res.status(200).json({assistants:data})
   } catch (error) {
     console.log("ERROR",error.message)
     
