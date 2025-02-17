@@ -14,12 +14,20 @@ utilRouter.post("/vapi/end-of-call", (req,res)=>{
 console.log(req.body,"BODY")
 });
 utilRouter.get("/vapi/calls",async (req,res)=>{
-  const {data} = await axios.get("https://api.vapi.ai/call",{
-    headers: {
-      'Authorization': `Bearer ${process.env.VAPI_KEY}`
-    }
-  })
-  res.status(200).json(data)
+  console.log("llego")
+  try {
+    const {data} = await axios.get("https://api.vapi.ai/call",{
+      headers: {
+        'Authorization': `Bearer ${process.env.VAPI_KEY}`
+      }
+    })
+    console.log("pas")
+    res.status(200).json({calls:data})
+  } catch (error) {
+    console.log("ERROR",error.message)
+    
+  }
+
 });
 
 module.exports = { utilRouter };
