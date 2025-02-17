@@ -29,5 +29,21 @@ utilRouter.get("/vapi/calls",async (req,res)=>{
   }
 
 });
+utilRouter.get("/vapi/assistants",async (req,res)=>{
+  console.log("llego")
+  try {
+    const {data} = await axios.get("https://api.vapi.ai/assistant",{
+      headers: {
+        'Authorization': `Bearer ${process.env.VAPI_KEY}`
+      }
+    })
+    console.log("pas")
+    res.status(200).json({calls:data})
+  } catch (error) {
+    console.log("ERROR",error.message)
+    
+  }
+
+});
 
 module.exports = { utilRouter };
