@@ -333,6 +333,7 @@ const getCoach = async (req, res) => {
 const userEmailExists = async (req, res) => {
   try {
     const email = req.params.email;
+    console.log(email)
     const userExists = await Coach.findOne({ email }).lean();
     res.status(200).json({ exists: !!userExists, authMethod: userExists?.SSO });
   } catch (error) {
