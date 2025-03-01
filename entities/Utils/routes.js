@@ -13,6 +13,11 @@ utilRouter.post("/execute-prompt", authMiddleware, executePromptController);
 utilRouter.post("/vapi/end-of-call", (req,res)=>{
 console.log(req.body,"BODY")
 });
+utilRouter.post("/vapi/my-tool", (req,res)=>{
+  console.log(req.body,"BODY")
+  console.log(req.headers,"HEADERS")
+
+  });
 utilRouter.get("/vapi/calls",async (req,res)=>{
   try {
     const {data} = await axios.get("https://api.vapi.ai/call",{
