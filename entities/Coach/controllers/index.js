@@ -150,7 +150,7 @@ const createCoach = async (req, res) => {
     const existingCoach = await Coach.findOne({ email: reqBody.email });
     if (existingCoach) {
       throw new Error(
-        `Another account with ${reqBody.email} email has already been taken`
+        `Another account with ${reqBody.email} email has already been taken !`
       );
     }
 
